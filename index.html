@@ -58,12 +58,12 @@
           <li class="nav-item active">
             <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="support">Support Me</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Source</a>
-          </li>
+          </li> -->
         </ul>
       </div>
     </nav>
@@ -77,35 +77,19 @@
     <div class="container">
       <!--First row-->
       <div class="row">
-        <div class="col-md-7">
-          <!--Featured image -->
-          <div class="view overlay hm-white-light z-depth-1-half">
-            <img src="fronpic.jpg" class="img-fluid " alt="">
-            <div class="mask">
-            </div>
-          </div>
-          <br>
-        </div>
-
-        <!--Main information-->
-        <div class="col-md-5 wow fadeInUp">
-          <h2 class="h2-responsive wow fadeInDown">Leetcode Rating Predictor</h2>
-          <hr>
-
-            <ul >
-              <li>Leetcode takes around 5 days to update ratings !</li>
-              <li >Waiting for rating change can be boring :(</li>
-              <li>So here i present Leetcode Rating Predictor. Using this you can check your predicted ratings as soon as 30-60 minutes after the contest</li>
-            </ul>
-            <div  style="text-align: center;">
-              <a href="predict" class="btn btn-primary">Predict Ratings</a>
-            </div>
-        </div>
+        <h3>Select Contest</h3>
       </div>
       <!--/.First row-->
 
       <hr class="extra-margins">
-
+        <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select Contest
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="results/weekly-contest-238.html">Weekly Contest 238</a>
+  </div>
+</div>
       
       
     </div>
@@ -113,34 +97,7 @@
 
   </main>
 
-  <div class="container">
-
-    <!-- Example row of columns -->
-    <div class="row">
-      <div class="col-md-3">
-      </div>
-
-      <div class="col-md-6">
-        <ul class="wow fadeInUp">
-        <li class="blue-text">Leetcode Rating Predictor needs manual efforts.</li>
-        <li class="blue-text">After every contest, i need to gather all data (using cloud CPUs because they are fast and im webscraping)</li>
-        <li class="blue-text">After getting all data, i run calculations for rating changes.</li>
-        <li class="blue-text">And then push the results to the frontend</li>
-        <li class="red-text">I try my best to keep this service free, but small donations of around 0.5$ to 1$ can help me sustain this project longer</li>
-        <div  style="text-align: center;">
-        <a href="support" class="btn btn-success">Support Me</a>
-        </div>
-      </ul>
-      
-      
-      </div>
-
-      <div class="col-md-3">
-
-      </div>
-
-    </div>
-    </div>
+  <div class="container"></div>
 
   <!--Footer-->
   <footer class="page-footer primary-color-dark center-on-small-only fixed">
