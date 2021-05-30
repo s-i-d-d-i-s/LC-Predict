@@ -1,0 +1,53 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>{{title}}</title>
+{% endblock title %}
+  
+
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <h1>Rating Predictions for {{title}}</h1>
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+          <h1>User : {{username}}</h1>
+          <div class="card">
+            <div class="card-body">
+              
+                <strong>Expected Rank: </strong> {{data.ERank|floatformat:2}}
+                <br>
+                <strong>Geometric Mean: </strong> {{data.GM|floatformat:2}}
+                <br>
+                <strong>Expected Rating: </strong>{{data.ERating|floatformat:2}}
+                <br>
+                {% if data.nature %}
+                    <strong>Delta: </strong> <strong class="text-success">{{data.Delta|floatformat:2}}</strong>
+                    <br>
+                    <br>
+                    <br>
+                    <h2><strong>New Rating: </strong>  <strong class="text-success">{{data.NewRating|floatformat:2}}</strong></h2>
+                {% else%}
+                    <strong>Delta: </strong> <strong class="text-danger">{{data.Delta|floatformat:2}}</strong>
+                    <br>
+                    <br>
+                    <br>
+                    <h2><strong>New Rating: </strong>  <strong class="text-danger">{{data.NewRating|floatformat:2}}</strong></h2>
+                {% endif %}
+                <br>
+            </div>
+          </div>
+      </div>
+    </section><!-- End Frequently Asked Questions Section -->
+
+{% endblock content %}

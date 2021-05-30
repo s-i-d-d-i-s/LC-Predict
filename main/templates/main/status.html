@@ -1,0 +1,84 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Contest Status</title>
+{% endblock title %}
+  
+
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <h1>Status of Contests</h1>
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+          {% for x in data%}
+          <div class="card">
+            <div class="card-body">
+              <strong>Name : </strong>{{x.title}}
+              <br>
+              {% if x.isProcess %}
+                <strong>Status : </strong> <strong class="text-warning"> Running </strong>
+              {% else %}
+                {% if x.isPredicted %}
+                    <strong>Status : </strong> <strong class="text-success"> Finished </strong>
+                {% else %}
+                    <strong>Status : </strong> <strong class="text-danger"> Waiting </strong>
+                {% endif %}
+              {% endif %}
+              <br>
+              {% if x.isMeta %}
+                <strong>Metadata Fetched : </strong> <strong class="text-success"> YES </strong> ( {{x.page_limit}} Pages) 
+              {% else %}
+                <strong>Metadata Fetched : </strong> <strong class="text-danger"> NO </strong>
+              {% endif %}
+              <br>
+              {% if x.isRanklist %}
+                <strong>Ranklist Fetched : </strong> <strong class="text-success"> YES </strong>
+              {% else %}
+                <strong>Ranklist Fetched : </strong> <strong class="text-danger"> NO </strong>
+              {% endif %}
+              <br>
+              {% if x.isUserdata %}
+                <strong>Userdata Fetched : </strong> <strong class="text-success"> YES </strong>
+              {% else %}
+                <strong>Userdata Fetched : </strong> <strong class="text-danger"> NO  </strong>({{x.userdata_progress}})
+              {% endif %}
+              <br>
+              {% if x.isPredicted %}
+              <strong>Enter Username</strong>
+              <div class="container">
+
+                  <div class="row">
+                    <div class="col-4-md">
+                      <input class="form-control" stype="text" id="{{x.pk}}username">
+                    </div>
+                    <div class="col-4-md pl-2">
+                      <button class="btn btn-info" onclick="getPrediction({{x.pk}})">Get Prediction</button>
+                    </div>
+                  </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+              
+          {% endfor %}
+      </div>
+    </section><!-- End Frequently Asked Questions Section -->
+
+<script type="text/javascript">
+    function getPrediction(pk){
+        username = document.getElementById(pk+'username').value;
+        window.location.href = "/predict/"+pk+"/"+username;
+    }
+</script>
+{% endblock content %}

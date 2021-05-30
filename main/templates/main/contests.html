@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <h2>Select Contest</h2>
+      <div class="row">
+        <form style="width: 100%;">
+            <select class="form-control"  onchange="location = this.value;">
+              <option value="#">Select Contest</option>
+              {% for x in data %}
+                <option value="{% url 'contests' %}/{{x.pk}}">{{x.title}}</option>
+              {% endfor %}
+            </select>
+        </form>
+
+      </div>
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+
+
+    </section><!-- End Frequently Asked Questions Section -->
+
+{% endblock content %}

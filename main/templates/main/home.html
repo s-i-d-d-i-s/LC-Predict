@@ -1,0 +1,169 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+
+{% block title %}
+<title>LC Predict</title>
+{% endblock title %}
+  
+{% block content %}
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
+          <h1>Leetcode Rating?</h1>
+          <h2>no more waiting...</h2>
+          <h2>{{predicitions_made}} predictions and counting...</h2>
+          <div class="d-lg-flex">
+            <a href="{% url 'status' %}" class="btn-get-started scrollto">Contests</a>
+          </div>
+        </div>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
+          <img src="https://assets.leetcode.com/static_assets/public/webpack_bundles/images/logo-dark.e99485d9b.svg" class="img-fluid animated" alt="">
+        </div>
+      </div>
+    </div>
+
+  </section><!-- End Hero -->
+
+  <main id="main">
+
+    {% if updates %}
+    <section class="faq section-bg">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Site Updates</h2>
+          
+        </div>
+
+        <div class="faq-list">
+          <ul>
+            {% for x in updates %}
+            <li data-aos="fade-up" data-aos-delay="100">
+                <p>
+                  {{x}}
+                </p>
+            </li>
+            {% endfor %}
+
+          </ul>
+        </div>
+
+      </div>
+    </section>
+    {% endif %}
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>About Us</h2>
+        </div>
+
+        <div class="row content">
+          <div class="col-lg-6">
+            <p>
+              LC Predict was created with only one thing in mind, Leetcode takes a lot of time to update ratings and it can sometimes become annyoing it would be great if we can get some idea about ratings beforehand right?
+            </p>
+          </div>
+          <div class="col-lg-6 pt-4 pt-lg-0">
+            <p>
+              So, i implemented a rating predictor in python, using the algorithm mentioned in this blog <a href="https://leetcode.com/discuss/general-discussion/468851/New-Contest-Rating-Algorithm-It's-HERE!/470020">🔥👩🏻‍💻New Contest Rating Algorithm👨🏽‍💻🔥 - It's HERE!</a>
+            </p>
+            <a href="https://github.com/s-i-d-d-i-s/Leetcode-Rating-Predictor" class="btn-learn-more">Project Repositry</a>
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End About Us Section -->
+
+    
+
+
+    <!-- ======= Team Section ======= -->
+    <section id="team" class="team section-bg">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Team</h2>
+        </div>
+
+        <div class="row">
+
+          <div class="col-lg-6">
+            <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="100">
+              <div class="pic"><img src="https://assets.leetcode.com/users/s59_60r/avatar_1618989758.png" class="img-fluid" alt=""></div>
+              <div class="member-info">
+                <h4>Siddharth Singh</h4>
+                <span>Developer & Owner</span>
+                <div class="social">
+                  <a href="https://leetcode.com/s59_60r/"><i class="ri-code-fill"></i></a>
+                  <a href="https://codeforces.com/profile/s59_60r"><i class="ri-code-fill"></i></a>
+                  <a href="https://atcoder.jp/users/s59_60r"><i class="ri-code-fill"></i></a>
+                  <a href="https://github.com/s-i-d-d-i-s"> <i class="ri-github-fill"></i> </a> 
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+    </section><!-- End Team Section -->
+
+    <!-- ======= Pricing Section ======= -->
+    
+
+    <!-- ======= Frequently Asked Questions Section ======= -->
+    <section id="faq" class="faq section-bg">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Frequently Asked Questions</h2>
+          
+        </div>
+
+        <div class="faq-list">
+          <ul>
+            <li data-aos="fade-up" data-aos-delay="100">
+              <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" class="collapse" href="#faq-list-1">Do we need to login? <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+              <div id="faq-list-1" class="collapse show" data-parent=".faq-list">
+                <p>
+                  No, we use public data to calculate everything. So, no need for logins :)
+                </p>
+              </div>
+            </li>
+
+            <li data-aos="fade-up" data-aos-delay="100">
+              <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" class="collapse" href="#faq-list-1">Why isn't the rating predictions out already? <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+              <div id="faq-list-1" class="collapse show" data-parent=".faq-list">
+                <p>
+                  The whole process of rating prediction is very CPU heavy, and also it needs to be initiated manually, so it may take some time. Currently, the team has only 1 member, so there can be some delay.
+                </p>
+              </div>
+            </li>
+
+
+            <li data-aos="fade-up" data-aos-delay="100">
+              <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" class="collapse" href="#faq-list-1">It has been more than a day, still predictions not out! <i class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
+              <div id="faq-list-1" class="collapse show" data-parent=".faq-list">
+                <p>
+                  The prediction process needs to be initiated manually, so if the predictions aren't out already, chances are either i forgot, or im sick or busy, and so not able to do that.
+                  <br>
+                  Reach out to me on my mail <span class="text-info"> siddharthsingh3099@gmail.com</span>. If its taking a lot of time.
+                  <br>
+                </p>
+              </div>
+            </li>
+
+
+          </ul>
+        </div>
+
+      </div>
+    </section><!-- End Frequently Asked Questions Section -->
+
+{% endblock content %}

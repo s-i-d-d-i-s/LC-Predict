@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      {% if msg %}
+      <h2>{{msg}}</h2>
+      {% endif %}
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+
+
+    </section><!-- End Frequently Asked Questions Section -->
+
+{% endblock content %}
