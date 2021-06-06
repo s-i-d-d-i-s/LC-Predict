@@ -110,7 +110,7 @@ def getUserData_CN(username,get_current,CONTEST):
 def getUserData(row,CONTEST_NAME,userdata,cache):
 	username=row[1]
 	fromCN = row[2]
-	if username in cache:
+	if cache!=None and username in cache:
 		print("Using Cache")
 		try:
 			userdata[username]=(cache[username][0],cache[username][1])
