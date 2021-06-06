@@ -1,23 +1,17 @@
 {% extends 'main/base.html' %}
 {% load static %}
 
+{% block title %}
+<title>Contest Status</title>
+{% endblock title %}
+  
+
 {% block content %}
  
   <section id="hero" class="d-flex align-items-center">
 
     <div class="container">
-      <h2>Select Contest</h2>
-      <div class="row">
-        <form style="width: 100%;">
-            <select class="form-control"  onchange="location = this.value;">
-              <option value="#">Select Contest</option>
-              {% for x in data %}
-                <option value="{% url 'contests' %}/{{x.pk}}">{{x.title}}</option>
-              {% endfor %}
-            </select>
-        </form>
-
-      </div>
+      <h1>Status of Contests</h1>
     </div>
 
   </section><!-- End Hero -->
@@ -27,8 +21,135 @@
     <!-- ======= About Us Section ======= -->
     <section id="about" class="about">
       <div class="container" data-aos="fade-up">
-
-
+          {% for x in data%}
+          {% if x.isPredicted == False %}
+          <div class="card">
+            <div class="card-body">
+              <strong>Name : </strong>{{x.title}}
+              <br>
+              {% if x.isProcess %}
+              <strong>Status : </strong> <strong class="text-warning" id="contest_status{{x.pk}}"> Running </strong>
+            {% else %}
+              {% if x.isPredicted %}
+                  <strong>Status : </strong> <strong class="text-success" id="contest_status{{x.pk}}"> Finished </strong>
+              {% else %}
+                  <strong>Status : </strong> <strong class="text-danger" id="contest_status{{x.pk}}"> Waiting </strong>
+              {% endif %}
+            {% endif %}
+            <br>
+              {% if x.isMeta %}
+                <strong>Metadata Fetched : </strong> <strong class="text-success" id="contest_meta{{x.pk}}"> YES </strong> ( {{x.page_limit}} Pages) 
+              {% else %}
+                <strong>Metadata Fetched : </strong> <strong class="text-danger" id="contest_meta{{x.pk}}"> NO </strong>
+              {% endif %}
+              <br>
+              {% if x.isRanklist %}
+                <strong>Ranklist Fetched : </strong> <strong class="text-success" id="contest_ranklist{{x.pk}}"> YES </strong>
+              {% else %}
+                <strong>Ranklist Fetched : </strong> <strong class="text-danger" id="contest_ranklist{{x.pk}}"> NO </strong>
+              {% endif %}
+              <br>
+              {% if x.isUserdata %}
+                <strong>Userdata Fetched : </strong> <strong class="text-success" id="contest_userdata{{x.pk}}"> YES </strong>
+              {% else %}
+                <strong>Userdata Fetched : </strong> <strong class="text-danger" id="contest_userdata{{x.pk}}"> ({{x.userdata_progress}})  </strong>
+              {% endif %}
+              
+              <br>
+              <button class="btn btn-info" onclick="runPrediction({{x.pk}})">Get Prediction</button>
+            </div>
+          </div>
+          {% endif %}
+          {% endfor %}
+      </div>
     </section><!-- End Frequently Asked Questions Section -->
 
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script type="text/javascript">
+    var APIKEY = localStorage.getItem("LCPredict_APIKEY");
+    if(APIKEY==null){
+        let foo = prompt('API Key was not found... Type here');
+        let bar = confirm('Confirm or deny');
+        localStorage.setItem("LCPredict_APIKEY", foo);
+    }
+    
+    var predictionRunning = false;
+    async function predict(pk){
+        while(true){
+            await new Promise(r => setTimeout(r, 10000));
+            getPrediction(pk);
+            getStatus(pk);
+        }
+    }
+    function getObj(id){
+        return document.getElementById(id)
+    }
+    function getPrediction(pk){
+        payload = 'api/predict/'+APIKEY+'/'+pk;
+        axios.get(payload).then(response=> {}).catch(error => console.error(error));
+    }
+    
+    function getStatus(pk){
+        payload = 'api/status/'+APIKEY+'/'+pk;
+        axios.get(payload)
+            .then(response=> {
+                response = response.data
+                var page_limit = response['page_limit'];
+                var isMeta = response['isMeta'];
+                var isPredicted = response['isPredicted'];
+                var isRanklist = response['isRanklist'];
+                var isUserdata = response['isUserdata'];
+                var isProcess = response['isProcess'];
+                var userdata_progress =response['userdata_progress'];
+                var page_limit_obj = getObj('contest_meta'+pk);                
+                if(isMeta){
+                    page_limit_obj.innerText = page_limit + " Pages";
+                    page_limit_obj.classList = 'text-success';
+                }else{
+                    page_limit_obj.innerText = "NO";
+                    page_limit_obj.classList = 'text-danger';
+                }
+                var contest_ranklist_obj = getObj('contest_ranklist'+pk);                
+                if(isRanklist){
+                  contest_ranklist_obj.innerText = "YES";
+                  contest_ranklist_obj.classList = 'text-success';
+                }else{
+                  contest_ranklist_obj.innerText = "NO";
+                  contest_ranklist_obj.classList = 'text-danger';
+                }
+                var contest_userdata_obj = getObj('contest_userdata'+pk);                
+                if(isUserdata){
+                  contest_userdata_obj.innerText = "YES";
+                  contest_userdata_obj.classList = 'text-success';
+                }else{
+                  contest_userdata_obj.innerText = userdata_progress;
+                  contest_userdata_obj.classList = 'text-danger';
+                }
+                var contest_status_obj = getObj('contest_status'+pk);   
+                if(isProcess){
+                  contest_status_obj.innerText = "Running";
+                  contest_status_obj.classList = 'text-warning';
+                }else{
+                  if(isPredicted){
+                    contest_status_obj.innerText = "Finished";
+                    contest_status_obj.classList = 'text-success';
+                  }else{
+                    contest_status_obj.innerText = "Waiting";
+                    contest_status_obj.classList = 'text-danger';
+                  }
+                }
+            })
+            .catch(error => console.error(error));
+    }
+    function runPrediction(pk){
+        if(predictionRunning==false){
+          predictionRunning=true;
+          predict(pk);
+        }else{
+          console.log('Prediction already running');
+        }
+    }
+</script>
 {% endblock content %}

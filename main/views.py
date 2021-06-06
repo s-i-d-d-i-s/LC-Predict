@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.http import HttpResponse
+import time
 from .models import Contest, SiteData
 from .LCPredictor import getPageNo,getRanklist,fetchAllUserData,getRatingChange,getRatingChangeCached
 from django.contrib.auth.decorators import login_required
@@ -41,14 +43,52 @@ def status(request):
 	obj = Contest.objects.all().order_by("-pk")
 	return render(request, 'main/status.html',{'data':obj,'title':'Status'})
 
-@login_required
-def predict_contest(request,pk):
+
+def predict_contest_api(request,apikey,pk):
+	obj = SiteData.objects.all().first()
+	keys = json.loads(obj.api_keys)
+	response = {'status':404,'msg':'API Key Mismatch'}
+	if apikey in keys:
+		response = {'status':200,'msg':'API Matched'}
+		obj = Contest.objects.filter(pk=pk)
+		if len(obj) ==0 :
+			response = {'status':404,'msg':'No Such Contest Exists'}
+		else:
+			obj = obj.first()
+			isRunning = int(time.time()) - obj.isProcess
+			if isRunning <= 50 :
+				response = {'status':404,'msg':'Prediction already running'}
+			else:
+				obj.isProcess=int(time.time())
+				obj.save()
+				predict_contest(pk)
+	return HttpResponse(json.dumps(response))
+
+def get_contest_status(request,apikey,pk):
+	obj = SiteData.objects.all().first()
+	keys = json.loads(obj.api_keys)
+	response = {'status':404,'msg':'API Key Mismatch'}
+	if apikey in keys:
+		response = {'status':200,'msg':'API Matched'}
+		obj = Contest.objects.filter(pk=pk)
+		if len(obj) ==0 :
+			response = {'status':404,'msg':'No Such Contest Exists'}
+		else:
+			obj = obj.first()
+			response['page_limit']=obj.page_limit
+			response['isMeta']=obj.isMeta
+			response['isPredicted']=obj.isPredicted
+			response['isProcess']=obj.isProcess
+			response['isRanklist']=obj.isRanklist
+			response['isUserdata']=obj.isUserdata
+			response['userdata_progress']=obj.userdata_progress
+	return HttpResponse(json.dumps(response))
+
+def predict_contest(pk):
 	obj = Contest.objects.filter(pk=pk).first()
 	if obj.isPredicted==True:
-		return render(request, 'main/showrating.html',{'msg':"Here are your rating changes"})
+		return {'msg':"Here are your rating changes"}
 	else:
-		obj.isProcess=True
-		obj.save()
 		if obj.isMeta==False:
 			pages = getPageNo(obj.slug)
 			obj.page_limit=pages
@@ -65,11 +105,9 @@ def predict_contest(request,pk):
 			obj.isUserdata=True
 			obj.save()
 		if obj.isUserdata and obj.isRanklist and obj.isMeta:
-			obj.isProcess=False
 			obj.isPredicted=True
 			obj.save()
-
-		return render(request, 'main/showrating.html',{'msg':"Rating Change has been calculated. Please try loading page again"})
+		return 
 
 
 @login_required
