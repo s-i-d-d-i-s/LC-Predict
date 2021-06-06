@@ -14,7 +14,7 @@ def view_plus():
 	upd = json.loads(upd)
 	obj.page_views+=1
 	obj.save()
-	return cur,upd
+	return cur,upd,obj.any_other_headers
 
 def prediction_plus(username,pk):
 	obj = SiteData.objects.all().first()
@@ -28,9 +28,10 @@ def prediction_plus(username,pk):
 	obj.save()
 
 def homepage(request):
-	predicitions_made,upd = view_plus()
-
-	return render(request, 'main/home.html',{'predicitions_made':predicitions_made,'updates':upd})
+	predicitions_made,upd,any_other_headers = view_plus()
+	if any_other_headers=='null':
+		any_other_headers=''
+	return render(request, 'main/home.html',{'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
 
 @login_required
 def allcontests(request):

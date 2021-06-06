@@ -72,7 +72,11 @@
     if(APIKEY==null){
         let foo = prompt('API Key was not found... Type here');
         let bar = confirm('Confirm or deny');
-        localStorage.setItem("LCPredict_APIKEY", foo);
+        if(true){
+            localStorage.setItem("LCPredict_APIKEY", foo);
+        }else{
+            window.location.href = "/";
+        }
     }
     
     var predictionRunning = false;
