@@ -40,9 +40,11 @@ def allcontests(request):
 
 
 def status(request):
-	view_plus()
+	predicitions_made,upd,any_other_headers = view_plus()
+	if any_other_headers=='null':
+		any_other_headers=''
 	obj = Contest.objects.all().order_by("-pk")
-	return render(request, 'main/status.html',{'data':obj,'title':'Status'})
+	return render(request, 'main/status.html',{'data':obj,'title':'Status','any_other_headers':any_other_headers})
 
 
 def predict_contest_api(request,apikey,pk):
@@ -123,11 +125,13 @@ def cache_contest(request,pk):
 		return render(request, 'main/showrating.html',{'msg':"Rating Change has not been calculated. Please try loading page again"})
 
 def predict_user(request,pk,username):
-	view_plus()
+	predicitions_made,upd,any_other_headers = view_plus()
+	if any_other_headers=='null':
+		any_other_headers=''
 	prediction_plus(username,pk)
 	try:
 		obj = Contest.objects.filter(pk=pk).first()
 	except:
 		return render(request, 'main/showrating.html',{'msg':"Invalid Contest Key"})
 	change_data = getRatingChange(username,obj.ranklist,obj.userdata)
-	return render(request, 'main/rating_predictions.html',{'data':change_data,'title':obj.title,'username':username})
+	return render(request, 'main/rating_predictions.html',{'data':change_data,'title':obj.title,'username':username,'any_other_headers':any_other_headers})
