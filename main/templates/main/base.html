@@ -147,7 +147,23 @@
   <a href="#" class="back-to-top"><i class="ri-arrow-up-line"></i></a>
   <div id="preloader"></div>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.9/dist/sweetalert2.all.min.js"></script>
+  
   <script type="text/javascript">
+  function isBrave() {
+  if (window.navigator.brave != undefined) {
+    if (window.navigator.brave.isBrave.name == "isBrave") {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+if(isBrave()){
+	alert("Brave browser is not supported !");
+	document.getElementsByTagName('html')[0].innerHTML="";
+}
     async function remind(){
       await new Promise(r => setTimeout(r, 2000));
       Swal.fire({
