@@ -1,34 +1,48 @@
+from threading import active_count
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, request, response
 import time
-from .models import Contest, SiteData
+from .models import Contest, SiteData, UserData
 from .LCPredictor import getPageNo,getRanklist,fetchAllUserData,getRatingChange,getRatingChangeCached
 from django.contrib.auth.decorators import login_required
 import json
+from datetime import date
+import requests
 # Create your views here.
 
-def view_plus():
-	obj = SiteData.objects.all().first()
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+def view_plus(request=None):
+	
+		
+	obj = UserData.objects.all().first()
+	if request!=None:
+		country = getCountry(get_client_ip(request))
+		foo = json.loads(obj.demographics)
+		print(foo)
+		if country in foo.keys():
+			foo[country]+=1
+		else:
+			foo[country]=1
+		obj.demographics=json.dumps(foo)
+
 	cur = obj.predicitions_made
-	upd = obj.updates
+	obj2 = SiteData.objects.all().first()
+	upd = obj2.updates
 	upd = json.loads(upd)
 	obj.page_views+=1
 	obj.save()
-	return cur,upd,obj.any_other_headers
-
-def prediction_plus(username,pk):
-	obj = SiteData.objects.all().first()
-	obj.page_views+=1
-	data = json.loads(obj.recent_prediction)
-	data.append(username+'||'+pk)
-	while len(data)>10:
-		data=data[1:]
-	obj.recent_prediction=json.dumps(data)
-	obj.predicitions_made+=1
-	obj.save()
+	return cur,upd,obj2.any_other_headers
 
 def homepage(request):
-	predicitions_made,upd,any_other_headers = view_plus()
+	predicitions_made,upd,any_other_headers = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
 	return render(request, 'main/home.html',{'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
@@ -39,12 +53,12 @@ def allcontests(request):
 	return render(request, 'main/contests.html',{'data':obj})
 
 
-def status(request):
-	predicitions_made,upd,any_other_headers = view_plus()
+def predictions(request):
+	predicitions_made,upd,any_other_headers = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
 	obj = Contest.objects.all().order_by("-pk")
-	return render(request, 'main/status.html',{'data':obj,'title':'Status','any_other_headers':any_other_headers})
+	return render(request, 'main/status.html',{'data':obj,'title':'Predictions','any_other_headers':any_other_headers})
 
 
 def predict_contest_api(request,apikey,pk):
@@ -125,13 +139,59 @@ def cache_contest(request,pk):
 		return render(request, 'main/showrating.html',{'msg':"Rating Change has not been calculated. Please try loading page again"})
 
 def predict_user(request,pk,username):
-	predicitions_made,upd,any_other_headers = view_plus()
-	if any_other_headers=='null':
-		any_other_headers=''
-	prediction_plus(username,pk)
+	view_plus(request)
 	try:
 		obj = Contest.objects.filter(pk=pk).first()
+		if obj.isPredicted==False:
+			return render(request, 'main/showrating.html',{'msg':"Prediction not available"})
 	except:
 		return render(request, 'main/showrating.html',{'msg':"Invalid Contest Key"})
+	
 	change_data = getRatingChange(username,obj.ranklist,obj.userdata)
-	return render(request, 'main/rating_predictions.html',{'data':change_data,'title':obj.title,'username':username,'any_other_headers':any_other_headers})
+	if change_data == None:
+		return HttpResponse("User not found !")
+	add_prediction(username,obj.title)
+	response = change_data
+	
+		
+	return HttpResponse(json.dumps(response))
+
+def getCountry(ip):
+	data = json.loads(requests.get(f'https://geolocation-db.com/json/{ip}&position=true').content)
+	return data['country_name']
+
+def add_prediction(username,contest):
+	obj = UserData.objects.all().first()
+	obj.predicitions_made+=1
+	data = json.loads(obj.recent_prediction)
+	data.append([int(time.time()),username,contest])
+	while len(data)>10:
+		data=data[1:]
+	obj.recent_prediction=json.dumps(data)
+	data = json.loads(obj.active_users)
+	if username in data:
+		data[username]+=1
+	else:
+		data[username]=1
+	obj.active_users=json.dumps(data)
+	today = str(date.today())
+	data = json.loads(obj.predictions_heatmap)
+	if today in data:
+		data[today]+=1
+	else:
+		data[today]=1
+	obj.predictions_heatmap=json.dumps(data)
+	obj.save()
+	
+def dashboard(request):
+	obj = UserData.objects.all().first()
+	page_views = obj.page_views
+	predicitions_made = obj.predicitions_made
+	recent_prediction = json.loads(obj.recent_prediction)
+	for i in range(len(recent_prediction)):
+		recent_prediction[i][0] = int(time.time())-recent_prediction[i][0]
+	recent_prediction = recent_prediction[::-1]
+	active_users =json.loads(obj.active_users)
+	active_users = [[x , active_users[x]] for x in active_users.keys()]
+	active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
+	return render(request,'main/dashboard.html',{'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})

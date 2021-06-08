@@ -54,8 +54,9 @@
           <li><a href="{% url 'home' %}">Home</a></li>
           {% if user.is_authenticated %}
           <li><a href="{% url 'contests' %}">Contests</a></li>
+          <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
           {% endif %}
-          <li><a href="{% url 'status' %}">Status</a></li>
+          <li><a href="{% url 'predictions' %}">Predictions</a></li>
           <li><a href="{% url 'home' %}#team">Team</a></li>
           <li><a href="{% url 'home' %}#faq">FAQ</a></li>
 
@@ -149,6 +150,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.9/dist/sweetalert2.all.min.js"></script>
   
   <script type="text/javascript">
+  {% if user.is_authenticated %}
+  {% else %}
   function isBrave() {
   if (window.navigator.brave != undefined) {
     if (window.navigator.brave.isBrave.name == "isBrave") {
@@ -164,6 +167,7 @@ if(isBrave()){
 	alert("Brave browser is not supported !");
 	document.getElementsByTagName('html')[0].innerHTML="";
 }
+{% endif %}
     async function remind(){
       await new Promise(r => setTimeout(r, 2000));
       Swal.fire({

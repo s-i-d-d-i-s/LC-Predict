@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Contest Status</title>
+<title>{{title}}</title>
 {{ any_other_headers|safe }}
 {% endblock title %}
   
@@ -12,7 +12,7 @@
   <section id="hero" class="d-flex align-items-center">
 
     <div class="container">
-      <h1>Status of Contests</h1>
+      <h1>Predictions</h1>
     </div>
 
   </section><!-- End Hero -->
@@ -66,6 +66,32 @@
                     <div class="col-4-md pl-2">
                       <button class="btn btn-info" onclick="getPrediction({{x.pk}})">Get Prediction</button>
                     </div>
+                    <div class="container-fluid p-0" style="display: none;" id='prediction_results{{x.pk}}'>
+                      <div class="card">
+                        <div class="card-body">
+                          
+                            <strong>Expected Rank: </strong> <span id="ERank{{x.pk}}"></span>
+                            <br>
+                            <strong>Geometric Mean: </strong> <span id="GM{{x.pk}}"></span>
+                            <br>
+                            <strong>Expected Rating: </strong><span id="ERating{{x.pk}}"></span>
+                            <br>
+                            <strong>Delta: </strong> <strong id="Delta{{x.pk}}" class="text-success"></strong>
+                            <br>
+                            <br>
+                            <br>
+                            <h2><strong>New Rating: </strong>  <strong class="text-success" id="NRating{{x.pk}}" ></strong></h2>
+                            <br>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="container-fluid p-0" style="display: none;" id='preloader_prediction_results{{x.pk}}'>
+                    <div class="card">
+                      <div class="card-body">
+                          <h2><strong>Predicting....</strong></h2>
+                      </div>
+                    </div>
+                </div>
                   </div>
               </div>
               {% endif %}
@@ -75,11 +101,62 @@
           {% endfor %}
       </div>
     </section><!-- End Frequently Asked Questions Section -->
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/javascript">
+    function getObj(id){
+        return document.getElementById(id)
+    }
     function getPrediction(pk){
         username = document.getElementById(pk+'username').value;
-        window.location.href = "/predict/"+pk+"/"+username;
+        obj = document.getElementById('prediction_results'+pk);
+        obj2 = document.getElementById('preloader_prediction_results'+pk);
+        obj.style='display: none;'
+        obj2.style='display: block;'
+        payload = '/predict/'+pk+'/'+username;
+          axios.get(payload).then(response=> {
+              response=response.data;
+              console.log(response);
+              if(response=='User not found !'){
+                  alert("User not found !");
+                  obj.style='display: none;'
+                  obj2.style='display: none;'
+              }else{
+              var foo = getObj('ERank'+pk);                
+              foo.innerText = response['ERank'].toFixed(2);
+
+              foo = getObj('GM'+pk);                
+              foo.innerText = response['GM'].toFixed(2);
+
+              foo = getObj('ERating'+pk);                
+              foo.innerText = response['ERating'].toFixed(2);
+
+              foo = getObj('Delta'+pk);      
+              if(response['nature']){
+                  foo.style='text-success';
+              }else{
+                  foo.style='text-danger';
+              }
+              var temp = document.createElement('span')
+              temp.innerHTML = response['Delta'].toFixed(2);
+              foo.textContent = '';
+              foo.appendChild(temp);
+
+              
+              foo = getObj('NRating'+pk);      
+              if(response['nature']){
+                  foo.style='text-success';
+              }else{
+                  foo.style='text-danger';
+              }
+              var temp = document.createElement('span')
+              temp.innerHTML = response['NewRating'].toFixed(2);
+              foo.textContent = '';
+              foo.appendChild(temp);
+              obj2.style='display: none;'
+              obj.style='display: block;'
+            }
+          }).catch(error => console.error(error));
+        
     }
 </script>
 {% endblock content %}

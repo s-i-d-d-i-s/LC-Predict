@@ -1,0 +1,84 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>{{title}}</title>
+{{ any_other_headers|safe }}
+{% endblock title %}
+  
+
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+          <div class="row p-2">
+              <div class="col-md-6">
+                  <h3><strong>Page Views : {{page_views }}</strong></h3>
+              </div>
+              <div class="col-md-6">
+                <h3><strong>Predictions Made : {{predicitions_made }}</strong></h3>
+              </div>
+          </div>
+          <hr>
+          <div class="row p-2">
+            <div class="col-md-6">   
+              <h3><strong>Recent Predictions</strong></h3>           
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Seconds Ago</th>
+                    <th scope="col">Handle</th>
+                    <th scope="col">Contest</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for x in recent_prediction %}
+                    <tr>
+                      <th >{{x.0}}</th>
+                      <td >{{x.1}}</td>
+                      <td>{{x.2}}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h3><strong>Top Predicted Users</strong></h3>           
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Handle</th>
+                    <th scope="col">Predictions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for x in active_users %}
+                    <tr>
+                      <th >{{x.0}}</th>
+                      <td >{{x.1}}</td>
+                    </tr>
+                  {% endfor %}
+                  
+                </tbody>
+              </table>
+            </div>
+        </div>
+        <hr>
+        <div class="row p-2">
+
+        </div>
+      </div>
+      </div>
+    </section><!-- End Frequently Asked Questions Section -->
+
+
+{% endblock content %}

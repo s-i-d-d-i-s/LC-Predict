@@ -19,11 +19,18 @@ class Contest(models.Model):
 		return "{} : {}".format(self.title,self.isPredicted)
 
 class SiteData(models.Model):
-	page_views = models.IntegerField(default=0)
-	predicitions_made = models.IntegerField(default=0)
 	any_other_headers = models.TextField(default="null")
-	recent_prediction = models.TextField(default="[]")
 	api_keys = models.TextField(default="[]")
 	updates =  models.TextField(default="[]")
+	def __str__(self):
+		return "PK : {}".format(self.pk)
+
+class UserData(models.Model):
+	page_views = models.IntegerField(default=0)
+	recent_prediction = models.TextField(default="[]")
+	demographics =  models.TextField(default="{}")
+	predicitions_made = models.IntegerField(default=0)
+	active_users = models.TextField(default="{}")
+	predictions_heatmap = models.TextField(default="{}")
 	def __str__(self):
 		return "Views : {}".format(self.page_views)
