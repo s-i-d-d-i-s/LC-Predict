@@ -117,7 +117,8 @@
               response=response.data;
               console.log(response);
               if(response=='User not found !'){
-                  alert("User not found !");
+                  Swal.fire("User not found !", "Please check the username.", "error");
+                  
                   obj.style='display: none;'
                   obj2.style='display: none;'
               }else{
@@ -131,14 +132,14 @@
               foo.innerText = response['ERating'].toFixed(2);
 
               foo = getObj('Delta'+pk);      
-              
+              if(response['nature']==true){
+                foo.classList='text-success';
+              }else{
+                foo.classList='text-danger';
+              }
               var temp = document.createElement('span')
               temp.innerHTML = response['Delta'].toFixed(2);
-              if(response['nature']==true){
-                temp.style='text-success';
-              }else{
-                temp.style='text-danger';
-              }
+ 
               foo.textContent = '';
               foo.appendChild(temp);
 
@@ -148,9 +149,9 @@
               var temp = document.createElement('span')
               temp.innerHTML = response['NewRating'].toFixed(2);
               if(response['nature']==true){
-                temp.style='text-success';
+                temp.classList='text-success';
               }else{
-                temp.style='text-danger';
+                temp.classList='text-danger';
               }
               foo.textContent = '';
               foo.appendChild(temp);
