@@ -131,25 +131,27 @@
               foo.innerText = response['ERating'].toFixed(2);
 
               foo = getObj('Delta'+pk);      
-              if(response['nature']==true){
-                  foo.style='text-success';
-              }else{
-                  foo.style='text-danger';
-              }
+              
               var temp = document.createElement('span')
               temp.innerHTML = response['Delta'].toFixed(2);
+              if(response['nature']==true){
+                temp.style='text-success';
+              }else{
+                temp.style='text-danger';
+              }
               foo.textContent = '';
               foo.appendChild(temp);
 
               
               foo = getObj('NRating'+pk);      
-              if(response['nature']==true){
-                  foo.style='text-success';
-              }else{
-                  foo.style='text-danger';
-              }
+              
               var temp = document.createElement('span')
               temp.innerHTML = response['NewRating'].toFixed(2);
+              if(response['nature']==true){
+                temp.style='text-success';
+              }else{
+                temp.style='text-danger';
+              }
               foo.textContent = '';
               foo.appendChild(temp);
               obj2.style='display: none;'
