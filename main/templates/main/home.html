@@ -44,7 +44,7 @@
             {% for x in updates %}
             <li data-aos="fade-up" data-aos-delay="100">
                 <p>
-                  {{x}}
+                  {{x|safe}}
                 </p>
             </li>
             {% endfor %}
