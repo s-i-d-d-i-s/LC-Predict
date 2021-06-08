@@ -131,7 +131,7 @@
               foo.innerText = response['ERating'].toFixed(2);
 
               foo = getObj('Delta'+pk);      
-              if(response['nature']){
+              if(response['nature']==true){
                   foo.style='text-success';
               }else{
                   foo.style='text-danger';
@@ -143,7 +143,7 @@
 
               
               foo = getObj('NRating'+pk);      
-              if(response['nature']){
+              if(response['nature']==true){
                   foo.style='text-success';
               }else{
                   foo.style='text-danger';
