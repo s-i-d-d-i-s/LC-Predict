@@ -1,0 +1,92 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}
+<title>{{title}}</title>
+{% endblock title %}
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      {% if msg %}
+      <h2>{{msg}}</h2>
+      {% endif %}
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+	{% if messages %}
+	<section class="faq section-bg">
+		<div class="container" data-aos="fade-up">
+			<div class="row p-2">
+				<div class="col-lg-12 md-12">
+				{% for message in messages %}
+	  				<div class="alert alert-{{ message.tags }}">
+						{{ message }}
+	  				</div>
+				{% endfor %}
+			</div>
+			</div>
+	</div>
+	</section>
+  {% endif %}
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+			<div class="row">	
+				<div class="col-md-6">				
+				<form method="POST">
+					{% csrf_token %}
+					<fieldset class="form-group">
+						<legend class="border-bottom mb-4">Register </legend>
+						{{ form|crispy }}
+						{{ profile_form|crispy }}
+					</fieldset>
+					<div class="form-group">
+						<button class="btn btn-outline-info" type="submit">Sign Up</button>
+					</div>
+				</form>
+				<div class="border-top pt-3">
+					<small class="text-muted">
+						Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Sign In</a>
+					</small>
+				</div>
+				</div>
+				<div class="col-md-6">
+					<div class="faq-list">
+						<ul>
+						  <li data-aos="fade-up" data-aos-delay="100">
+							  <p>
+								You need to register to use awesome analysis tools like <a href="{% url 'foresight' %}">Foresight</a>
+							  </p>
+						  </li>
+						  <li data-aos="fade-up" data-aos-delay="100">
+							<p>
+							  <strong>Foresight</strong> let's you know the maximum rank you can have while having a +ve Rating change based on current rating and contest participated.
+							</p>
+						  </li>
+						  <li data-aos="fade-up" data-aos-delay="100">
+							<img class="img-fluid" src="{% static 'main/example2.png' %}">
+						  </li>
+						  <li data-aos="fade-up" data-aos-delay="100">
+							<p>
+							  If you are stuck somewhere, use the <a href="https://github.com/s-i-d-d-i-s/LC-Predict/discussions">Discuss</a> fourm to ask any type of queries.
+							</p>
+						  </li>
+						</ul>
+					  </div>
+				</div>
+			</div>
+	   </div>
+
+
+    </section><!-- End Frequently Asked Questions Section -->
+<script>
+	dh = document.getElementById('hero');
+	console.log(dh);
+	dh.style['height']="10vh"
+
+
+</script>
+{% endblock content %}

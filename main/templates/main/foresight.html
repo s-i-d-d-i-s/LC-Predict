@@ -1,0 +1,107 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block title %}
+<title>{{title}}</title>
+{% endblock title %}
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      {% if msg %}
+      <h2>{{msg}}</h2>
+      {% endif %}
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+		  	{% if request.user.profile.isVerified %}
+			<div class="container">
+				<div class="row">
+					<div class="col-md-3">
+						<input class="form-control" stype="text" id="rating" placeholder="Rating">
+					</div>
+					<div class="col-md-3">
+						<input class="form-control" stype="text" id="played" placeholder="Contest Played">
+					</div>
+				</div>
+				
+                <button class="mt-3 btn btn-info" onclick="getMinRank()">Get Foresight</button>    
+				<div class="container-fluid m-2"  id='foresight_results' style="display: none;"> 
+					<div class="card">
+					  <div class="card-body">
+						  <h2>Foresight Result based on last 5 contests</h2>
+								<ul>
+									<li id="result_1"></li>
+									<li id="result_2"></li>
+									<li id="result_3"></li>
+									<li id="result_4"></li>
+									<li id="result_5"></li>
+								</ul>
+						  <br>
+					  </div>
+					</div>
+				</div>
+				<div class="container-fluid m-2"  id='foresight_progress' style="display: none;"> 
+					<div class="card">
+					  <div class="card-body">
+						  <h2>Doing dat magic ... </h2>
+					  </div>
+					</div>
+				</div>
+			</div>
+			{% else %}
+				<h2>You need to verify your account before you can use <a href="{% url 'foresight' %}">Foresight</a></h2>
+				<a class="btn btn-success" href="{% url 'verify' %}">Verify your Account !</a>
+			{% endif %}
+	   </div>
+
+
+    </section>
+{% if request.user.profile.isVerified %}
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+	axios.defaults.xsrfCookieName = 'csrftoken';
+	axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+	function getMinRank(){
+		var rating = document.getElementById('rating').value;
+		var played = document.getElementById('played').value;
+		var loader_obj = document.getElementById('foresight_progress');
+		var result_obj = document.getElementById('foresight_results');
+		result_obj.style='display:none;';
+		loader_obj.style='display:inline-block';
+		axios.post('/api/foresight', {
+			data:{
+				played: played,
+				rating: rating,
+			}
+		})
+		.then((response) => {
+			var data = response.data;
+			console.log(data);
+			if(data['status']==1){
+				data = data['data'];
+				for(let i=1;i<=5;i++){
+					var obj = document.getElementById('result_'+i);
+					obj.innerHTML=data[i-1];
+				}
+				loader_obj.style='display:none;';
+				result_obj.style='display:inline-block';
+			}else{
+				loader_obj.style='display:none;';
+				result_obj.style='display:none;';
+				alert(data['data']);
+			}
+			
+		},(error) => {
+			console.log(error);
+		});
+	}
+</script>
+{% endif %}
+{% endblock content %}

@@ -1,13 +1,18 @@
 from threading import active_count
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, request, response
 import time
-from .models import Contest, SiteData, UserData
-from .LCPredictor import getPageNo,getRanklist,fetchAllUserData,getRatingChange,getRatingChangeCached
+from .models import Contest, SiteData, UserData, Profile
+from .LCPredictor import getPageNo,getRanklist,fetchAllUserData,getRatingChange,getRatingChangeCached,getForesight
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 import json
 from datetime import date
+from django.contrib import messages
 import requests
+import string
+import random
+from .forms import UserRegisterForm,UserProfileForm
 # Create your views here.
 
 def get_client_ip(request):
@@ -157,8 +162,11 @@ def predict_user(request,pk,username):
 	return HttpResponse(json.dumps(response))
 
 def getCountry(ip):
-	data = json.loads(requests.get(f'https://geolocation-db.com/json/{ip}&position=true').content)
-	return data['country_name']
+	try:
+		data = json.loads(requests.get(f'https://geolocation-db.com/json/{ip}&position=true').content)
+		return data['country_name']
+	except:
+		return "Country API Error"
 
 def add_prediction(username,contest):
 	obj = UserData.objects.all().first()
@@ -195,3 +203,127 @@ def dashboard(request):
 	active_users = [[x , active_users[x]] for x in active_users.keys()]
 	active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
 	return render(request,'main/dashboard.html',{'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
+
+@login_required
+def foresight_api(request):
+	if request.user.profile.isVerified==False:
+		return HttpResponse(json.dumps({'status':0, 'data':"Not Allowed : Account Not Verified"}))
+	if request.user.profile.isBlacklist==True:
+		return HttpResponse(json.dumps({'status':0, 'data':"Not Allowed : Account Blacklisted for multiple unfollows on \"https://github.com/s-i-d-d-i-s\""}))
+	last_user_foresight = request.user.profile.last_user_foresight
+	time_now = time.time()
+	gap = time_now - last_user_foresight
+	if gap <= 60:
+		return HttpResponse(json.dumps({'status':0, 'data': "Please wait "+str(int(60-gap))+' Seconds'}))
+		return HttpResponse("Please wait "+str(60-gap)+' Seconds')
+	
+	if request.method=='POST':
+		data = json.loads(request.body)
+		if check_following(request.user.profile.github) == False:
+			request.user.profile.violations+=1
+			if request.user.profile.violations >=3:
+				request.user.profile.isBlacklist=True
+			request.user.profile.save()
+			return HttpResponse(json.dumps({'status':0, 'data':'You are not following "https://github.com/s-i-d-d-i-s"\nRepeated actions will make foresight unusable for this account' }))
+		data=data['data']
+		rating=data['rating']
+		contest_played=data['played']
+		res = []
+		data = Contest.objects.all().order_by('-pk')
+		cnt=5
+		for x in data:
+			if cnt==0:
+				break
+			temp = int(getForesight(x.ranklist,x.userdata,int(rating),int(contest_played)))
+			res.append(f'Rank around <strong class="text-success">{temp}</strong> in {x.title}')
+			cnt-=1
+		request.user.profile.last_user_foresight = time_now
+		request.user.profile.save()
+		return HttpResponse(json.dumps({'status':1, 'data':res}))
+	else:
+		return HttpResponse("Not Allowed")
+		
+@login_required
+def foresight(request):
+	return render(request,'main/foresight.html',{'msg':"Know Minimum Rank to get +ve Rating change based on Historic Data",'title':"Foresight"})
+
+
+def register(request):
+	if request.method=='POST':
+		form = UserRegisterForm(request.POST)
+		profile_form = UserProfileForm(request.POST)
+		if form.is_valid() and profile_form.is_valid() :
+			github = profile_form.cleaned_data.get('github')
+			tmp = len(Profile.objects.filter(github=github).all())
+			if tmp!=0:
+				messages.warning(request,f"Github Account already being used !")
+				return redirect('register')
+			user = form.save()
+			profile = profile_form.save(commit=False)
+			profile.user = user
+			profile.save()
+			username = form.cleaned_data.get('username')
+			messages.success(request,f"Account Created for {username}")
+			return redirect('login')
+	else:
+		form = UserRegisterForm()
+		profile_form = UserProfileForm()
+	return render(request,'main/register.html',{'form':form,'title':"Register",'profile_form':profile_form})
+
+def generateHash():
+	length = 10
+	result_str = ''.join(random.choice(string.ascii_uppercase) for i in range(length))
+	return result_str
+
+@login_required
+def verify_account(request):
+	user = request.user
+	if user.profile.isVerified:
+		return render(request,'main/verify.html',{'title':'Verified','msg':'Your account has been verified!'})
+	if user.profile.hashVal=="":
+		hashVal = generateHash()
+		user.profile.hashVal=hashVal
+		user.profile.save()
+	hashVal = user.profile.hashVal
+	return render(request,'main/verify.html',{'title':'Verify your account','msg':'Please verify your account','hash':hashVal,'account':user.profile.github})
+
+def check_hash(username,hashVal):
+	data = json.loads(requests.get(f'https://api.github.com/users/{username}').content)
+	return data['name'].strip()==hashVal
+
+def check_following(username):
+	data=[]
+	for i in [0,1,2,3]:
+		cur = json.loads(requests.get(f'https://api.github.com/users/{username}/following?per_page=1000&page={i}').content)
+		if len(cur)==0:
+			break
+		cur = [x['login'] for x in cur]
+		data.extend(cur)
+	return 's-i-d-d-i-s' in data
+
+@login_required
+def verify_account_api(request):
+	user = request.user
+	if user.profile.isVerified:
+		return HttpResponse(json.dumps({'status':1}))
+	hashVal = user.profile.hashVal
+	github = user.profile.github
+	last_verify = user.profile.last_tried_verify
+	time_now = time.time()
+	gap = time_now - last_verify
+	print(gap)
+	if gap >= 5*60:
+		if check_hash(user.profile.github,hashVal) == False:
+			user.profile.last_tried_verify = time_now
+			user.profile.save()
+			return HttpResponse(json.dumps({'status':0}))
+		if check_following(user.profile.github) == False:
+			user.profile.last_tried_verify = time_now
+			user.profile.save()
+			return HttpResponse(json.dumps({'status':2}))
+		user.profile.last_tried_verify = time_now
+		user.profile.isVerified=True
+		user.profile.save()
+		return HttpResponse(json.dumps({'status':1}))
+
+	return HttpResponse(json.dumps({'status':3,'time':int(gap)}) )

@@ -225,7 +225,6 @@ def getRatingChange(username,ranklist,userData):
 		except:
 			return None
 	try:
-
 		ranklist = json.loads(ranklist)
 		userData = json.loads(userData)
 		ret_data={}
@@ -274,4 +273,86 @@ def getRatingChangeCached(ranklist,userData):
 		for j in range(len(THREADS)):
 			THREADS[j].join()
 		print(f"{i+50}/{ranklist_size}")
+	return res
+
+
+def getRating_fore(ranklist,userData,userRating,contest_played,userRank):
+	def E(a,b):
+		return 1/(1+math.pow(10,(b-a)/400))
+	
+	def getActualRank(username):
+		for i in range(len(ranklist)):
+			if ranklist[i][1]==username:
+				return i+1
+		return None
+
+	def getERank(userRating,ranklist,userData):
+		ans = 1
+		for i in range(len(ranklist)):
+			try:
+				ans+= ((E(userData[ranklist[i][1]][0],userRating)))
+			except:
+				pass
+		return ans
+	
+	def getMi(Erank,Rank):
+		return math.sqrt(Rank*Erank)
+	
+	def checkBS(Erating):
+		ans = 1
+		for i in range(len(ranklist)):
+			try:
+				ans+= ( (E(userData[ranklist[i][1]][0],Erating)) )
+			except:
+				pass
+		return ans
+	
+	def getErating(rating,m):
+		l=1
+		r=100000
+		while r-l > 0.1:
+			mid = (l+r)/2
+			cur = checkBS(mid)
+			if cur>m:
+				l=mid
+			else:
+				r=mid
+		return l
+	
+	def f(k):
+		if k==1:
+			return 0.5
+		return 2/9
+	
+	def getDelta(Erating,rating,k):
+		try:
+			return f(k)*(Erating-rating)
+		except:
+			return None
+	ERank = getERank(userRating,ranklist,userData)
+	ar = userRank
+	mi = getMi(ERank,ar)
+	ERating = getErating(userRating,mi)
+	delta = getDelta(ERating,userRating,contest_played)
+	
+	return delta
+
+def getForesight(ranklist,userData,userRating,contest_played):
+	ranklist = json.loads(ranklist)
+	userData = json.loads(userData)
+	l=1
+	r=25000
+	res=1
+	# for i in range(l,r+1):
+	# 	f = getRating_fore(ranklist,userData,userRating,contest_played,i)
+	# 	print(i,f)
+
+	while l<=r:
+		m = (l+r)/2
+		f = getRating_fore(ranklist,userData,userRating,contest_played,m)
+		if f>0:
+			res = max(res,m)
+			l=m+1
+		else:
+			r=m-1
 	return res

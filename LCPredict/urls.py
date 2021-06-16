@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from main import views as main_view
+from django.contrib.auth import views as auth_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_view.homepage, name='home'),
@@ -25,5 +27,12 @@ urlpatterns = [
     path('api/status/<apikey>/<pk>', main_view.get_contest_status, name='predict_contest_api'),
     path('predict/<pk>/<username>', main_view.predict_user, name='predict_user'),
     path('cache/<pk>', main_view.cache_contest, name='cache_contest'),
-    path('dashboard',main_view.dashboard,name='dashboard')
+    path('dashboard',main_view.dashboard,name='dashboard'),
+	path('foresight',main_view.foresight,name='foresight'),
+	path('api/foresight',main_view.foresight_api,name='foresight_api'),
+	path('register',main_view.register,name='register'),
+	path('verify',main_view.verify_account,name='verify'),
+	path('api/verify',main_view.verify_account_api,name='verify_api'),
+    path('login/', auth_views.LoginView.as_view(template_name='main/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='main/logout.html'), name='logout'),
 ]

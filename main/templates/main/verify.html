@@ -1,0 +1,135 @@
+{% extends 'main/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}
+<title>{{title}}</title>
+{% endblock title %}
+{% block content %}
+ 
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      {% if msg %}
+      <h2>{{msg}}</h2>
+      {% endif %}
+    </div>
+
+  </section><!-- End Hero -->
+  <main id="main">
+
+    <!-- ======= About Us Section ======= -->
+    <section id="about" class="about">
+      <div class="container" data-aos="fade-up">
+		  <div class="row">
+			<div class="col-md-6">
+		<div class="faq-list">
+			<h3>Steps to verify your account</h3>
+			<ul>
+			  <li data-aos="fade-up" data-aos-delay="100">
+					<p>
+						Open Your <a href="https://www.github.com/settings/profile">Github</a> with username "{{user.profile.github}}"
+					</p>
+				</li>
+
+				<li data-aos="fade-up" data-aos-delay="100">
+					<p>
+						Change your Name to  "<strong class="text-danger">{{hash}}</strong>" (without the quotes) temporarily
+					</p>
+				</li>
+				<li data-aos="fade-up" data-aos-delay="100">
+					<p>
+						Follow <a href="https://github.com/s-i-d-d-i-s">Me</a>
+						<img width="30px;" height="30px;"  src="https://images.emojiterra.com/google/android-10/512px/1f97a.png">
+						<details>
+							<summary>Why?</summary>
+							<ol><li>It hardly takes 3 seconds</li>
+								<li>You all get something, and this works as a motivation for me</li>
+								<li>Please <img width="30px;" height="30px;"  src="https://images.emojiterra.com/google/android-10/512px/1f97a.png"></li>
+							</ol>
+						</details>
+					</p>
+				</li>
+				<li data-aos="fade-up" data-aos-delay="100">
+					<p>
+						Verification won't work if 
+						<ul>
+							<li class="text-danger">You don't have your name set as "{{hash}}" (without the quotes)</li>
+							<li class="text-danger">You don't follow <a href="https://github.com/s-i-d-d-i-s">Me</a></li>
+						</ul>
+					</p>
+				</li>
+				<li data-aos="fade-up" data-aos-delay="100">
+					<p>
+						<button class="btn btn-success" onclick="verify_api()">Verify</button>
+					</p>
+				</li>
+				<li class="p-2 mt-2" id="verification_result" style="list-style: none;border-style: ridge;display:none;"> 
+					
+				</li>
+			</ul>
+		  </div>
+		  </div>
+		  <div class="col-md-6">
+			<img class="img-fluid" src="{% static 'main/example1.png' %}"> 
+			<div class="container mt-2 p-3" style="border-style: ridge;">
+				<h5>Why verification ? </h5>
+				<p>The foresight is a rather CPU heavy process. Simply put we perform upto 10^7 operation per foresight<br><br>
+				  Its simply not possible to make it open to everyone, otherwise the website will crash.
+				  <br><br>
+				  So, I came up with this registration procedure, it doesn't involves any Log In from your Github, and we link an account to a user
+				  <br><br></p>
+			</div>
+		  </div>
+		  
+		  </div>
+	  </div>
+    </section><!-- End Frequently Asked Questions Section -->
+<script>
+	dh = document.getElementById('hero');
+	console.log(dh);
+	dh.style['height']="90vh"
+</script>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+	axios.defaults.xsrfCookieName = 'csrftoken';
+	axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+	function verify_api(){
+		var username = "{{user.username}}"	
+		var result_obj = document.getElementById('verification_result');
+		result_obj.style='list-style: none;border-style: ridge;display:none;';
+		console.log(result_obj);
+		axios.post('/api/verify', {
+			data:{
+				username: username
+			}
+		})
+		.then((response) => {
+			var data = response.data;
+			console.log(data);
+			var verification_result = document.getElementById('verification_result');
+			verification_result.innerHTML="";
+			var success_verict = `
+			<p>
+						<h4 id="name_match">Name set to {{hash}}</h4>
+						<h4 id="follow_match">You are following <a href="https://github.com/s-i-d-d-i-s">Me</a></h4>
+						<h4 id="verification_verdict">Account Verified !</h4>
+					</p>
+			`;
+			
+			if(data['status']==0){
+				verification_result.innerHTML="<p>Your Name was not set to \"{{hash}}\" (without the quotes)</p>";
+			}else if(data['status']==3){
+				verification_result.innerHTML="<p>Your tried verifying recently, try again in "+(300-data['time'])+" seconds !</p>";
+			}else if(data['status']==2){
+				verification_result.innerHTML="<p>You don't follow <a href=\"https://github.com/s-i-d-d-i-s\">Me</a>.</p>";
+			}else if(data['status']==1){
+				verification_result.innerHTML="<p>Your account was succesfully verified ! </p>";
+			}
+			result_obj.style='list-style: none;border-style: ridge;display:inline-block;';
+		},(error) => {
+			console.log(error);
+		});
+	}
+</script>
+{% endblock content %}

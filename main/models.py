@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 # Create your models here.
 class Contest(models.Model):
@@ -34,3 +36,17 @@ class UserData(models.Model):
 	predictions_heatmap = models.TextField(default="{}")
 	def __str__(self):
 		return "Views : {}".format(self.page_views)
+
+class Profile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	github = models.CharField(max_length=30)
+	isVerified = models.BooleanField(default=False)
+	last_tried_verify = models.IntegerField(default=0)
+	hashVal = models.CharField(max_length=25,default="")
+	last_user_foresight = models.IntegerField(default=0)
+	violations = models.IntegerField(default=0)
+	isBlacklist = models.BooleanField(default=False)
+
+
+	def __str__(self):
+		return f'{self.user.username} Profile'

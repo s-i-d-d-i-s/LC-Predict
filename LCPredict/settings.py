@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main'
+    'main',
+	'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,8 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 django_heroku.settings(locals())
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+LOGIN_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'

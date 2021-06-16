@@ -20,6 +20,7 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="{% static 'main/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'main/assets/vendor/icofont/icofont.min.css' %}" rel="stylesheet">
   <link href="{% static 'main/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
@@ -52,15 +53,20 @@
       <nav class="nav-menu d-none d-lg-block">
         <ul>
           <li><a href="{% url 'home' %}">Home</a></li>
-          {% if user.is_authenticated %}
-          <li><a href="{% url 'contests' %}">Contests</a></li>
+		  {% if user.username == 's59_60r' %} 
+		  <li><a href="{% url 'contests' %}">Contests</a></li>
           <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+		  {% endif %}
+          {% if user.is_authenticated %}
+          <li><a href="{% url 'logout' %}">Logout</a></li>
+		  {% else %}
+		  <li><a href="{% url 'register' %}">Register</a></li>
+		  <li><a href="{% url 'login' %}">Login</a></li>
           {% endif %}
 		  <li><a href="https://github.com/s-i-d-d-i-s/LC-Predict/discussions">Discuss</a></li>
           <li><a href="{% url 'predictions' %}">Predictions</a></li>
-          <li><a href="{% url 'home' %}#team">Team</a></li>
-          <li><a href="{% url 'home' %}#faq">FAQ</a></li>
-
+		  <li><a href="{% url 'foresight' %}"><i class="fa fa-star" style="color:red"></i>Foresight<i class="fa fa-star" style="color:red"></i></a></li>
+		  
         </ul>
       </nav><!-- .nav-menu -->
     </div>
