@@ -32,6 +32,7 @@ class UserData(models.Model):
 	recent_prediction = models.TextField(default="[]")
 	demographics =  models.TextField(default="{}")
 	predicitions_made = models.IntegerField(default=0)
+	foresight_made = models.IntegerField(default=0)
 	active_users = models.TextField(default="{}")
 	predictions_heatmap = models.TextField(default="{}")
 	def __str__(self):

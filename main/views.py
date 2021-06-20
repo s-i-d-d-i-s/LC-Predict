@@ -42,13 +42,13 @@ def view_plus(request=None):
 	upd = json.loads(upd)
 	obj.page_views+=1
 	obj.save()
-	return cur,upd,obj2.any_other_headers
+	return cur,upd,obj2.any_other_headers,obj.foresight_made
 
 def homepage(request):
-	predicitions_made,upd,any_other_headers = view_plus(request)
+	predicitions_made,upd,any_other_headers,foresight_made = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
-	return render(request, 'main/home.html',{'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
+	return render(request, 'main/home.html',{'foresight_made':foresight_made,'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
 
 @login_required
 def allcontests(request):
@@ -57,7 +57,7 @@ def allcontests(request):
 
 
 def predictions(request):
-	predicitions_made,upd,any_other_headers = view_plus(request)
+	predicitions_made,upd,any_other_headers,foresight_made = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
 	obj = Contest.objects.all().order_by("-pk")
@@ -166,6 +166,11 @@ def getCountry(ip):
 	except:
 		return "Country API Error"
 
+def add_foresight():
+	obj = UserData.objects.all().first()
+	obj.foresight_made+=1
+	obj.save()
+
 def add_prediction(username,contest):
 	obj = UserData.objects.all().first()
 	obj.predicitions_made+=1
@@ -200,6 +205,7 @@ def dashboard(request):
 	active_users =json.loads(obj.active_users)
 	active_users = [[x , active_users[x]] for x in active_users.keys()]
 	active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
+	active_users=active_users[:20]
 	return render(request,'main/dashboard.html',{'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
 
 @login_required
@@ -231,6 +237,7 @@ def foresight_api(request):
 			cnt-=1
 		request.user.profile.last_user_foresight = time_now
 		request.user.profile.save()
+		add_foresight()
 		return HttpResponse(json.dumps({'status':1, 'data':res}))
 	else:
 		return HttpResponse("Not Allowed")
