@@ -25,8 +25,6 @@ def get_client_ip(request):
 
 
 def view_plus(request=None):
-	
-		
 	obj = UserData.objects.all().first()
 	if request!=None:
 		country = getCountry(get_client_ip(request))
@@ -219,12 +217,6 @@ def foresight_api(request):
 	
 	if request.method=='POST':
 		data = json.loads(request.body)
-		if check_following(request.user.profile.github) == False:
-			request.user.profile.violations+=1
-			if request.user.profile.violations >=3:
-				request.user.profile.isBlacklist=True
-			request.user.profile.save()
-			return HttpResponse(json.dumps({'status':0, 'data':'You are not following "https://github.com/s-i-d-d-i-s"\nRepeated actions will make foresight unusable for this account' }))
 		data=data['data']
 		rating=data['rating']
 		contest_played=data['played']
@@ -291,16 +283,6 @@ def check_hash(username,hashVal):
 	data = json.loads(requests.get(f'https://api.github.com/users/{username}').content)
 	return data['name'].strip()==hashVal
 
-def check_following(username):
-	data=[]
-	for i in [0,1,2,3]:
-		cur = json.loads(requests.get(f'https://api.github.com/users/{username}/following?per_page=1000&page={i}').content)
-		if len(cur)==0:
-			break
-		cur = [x['login'] for x in cur]
-		data.extend(cur)
-	return 's-i-d-d-i-s' in data
-
 @login_required
 def verify_account_api(request):
 	user = request.user
@@ -317,10 +299,6 @@ def verify_account_api(request):
 			user.profile.last_tried_verify = time_now
 			user.profile.save()
 			return HttpResponse(json.dumps({'status':0}))
-		if check_following(user.profile.github) == False:
-			user.profile.last_tried_verify = time_now
-			user.profile.save()
-			return HttpResponse(json.dumps({'status':2}))
 		user.profile.last_tried_verify = time_now
 		user.profile.isVerified=True
 		user.profile.save()
