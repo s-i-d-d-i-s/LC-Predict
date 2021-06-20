@@ -41,13 +41,26 @@ class UserData(models.Model):
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	github = models.CharField(max_length=30)
+	apikey = models.CharField(max_length=30,default='null')
+	isStaff = models.BooleanField(default=False)
 	isVerified = models.BooleanField(default=False)
 	last_tried_verify = models.IntegerField(default=0)
 	hashVal = models.CharField(max_length=25,default="")
 	last_user_foresight = models.IntegerField(default=0)
+	foresights_made = models.IntegerField(default=0)
 	violations = models.IntegerField(default=0)
 	isBlacklist = models.BooleanField(default=False)
 
-
 	def __str__(self):
 		return f'{self.user.username} Profile'
+
+class Team(models.Model):
+	name = models.CharField(max_length=30,default='null')
+	img = models.CharField(max_length=255,default='#')
+	work = models.CharField(max_length=30,default='null')
+	github = models.CharField(max_length=30,default='null')
+	codeforces = models.CharField(max_length=30,default='null')
+	leetcode = models.CharField(max_length=30,default='null')
+	atcoder = models.CharField(max_length=30,default='null')
+	def __str__(self):
+		return self.name

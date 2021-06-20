@@ -21,11 +21,14 @@
       <div class="container" data-aos="fade-up">
 		
           <div class="row p-2">
-              <div class="col-md-6">
+              <div class="col-md-4">
                   <h3><strong>Page Views : {{page_views }}</strong></h3>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <h3><strong>Predictions Made : {{predicitions_made }}</strong></h3>
+              </div>
+			  <div class="col-md-4">
+                <h3><strong>Foresight Made : {{ foresight_made }}</strong></h3>
               </div>
           </div>
           <hr>
@@ -75,7 +78,46 @@
         </div>
         <hr>
         <div class="row p-2">
-            
+            <div class="col-md-6">
+				<h3><strong>Top Countries</strong></h3>           
+				<table class="table">
+				  <thead class="thead-light">
+					<tr>
+					  <th scope="col">Country</th>
+					  <th scope="col">Predictions</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					{% for x in demographics %}
+					  <tr>
+						<th >{{x.0}}</th>
+						<td >{{x.1}}</td>
+					  </tr>
+					{% endfor %}
+					
+				  </tbody>
+				</table>
+			  </div>
+			  <div class="col-md-6">
+				<h3><strong>Top Foresight User</strong></h3>           
+				<table class="table">
+				  <thead class="thead-light">
+					<tr>
+					  <th scope="col">User</th>
+					  <th scope="col">Foresights Made</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					{% for x in foresights %}
+					  <tr>
+						<th >{{x.user.username}}</th>
+						<td >{{x.foresights_made}}</td>
+					  </tr>
+					{% endfor %}
+					
+				  </tbody>
+				</table>
+			  </div>
         </div>
       </div>
       </div>

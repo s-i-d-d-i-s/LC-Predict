@@ -106,22 +106,23 @@
         </div>
 
         <div class="row">
-
+			{% for x in members %}
           <div class="col-lg-6">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="100">
-              <div class="pic"><img src="https://assets.leetcode.com/users/s59_60r/avatar_1618989758.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{x.img}}" class="img-fluid" alt=""></div>
               <div class="member-info">
-                <h4>Siddharth Singh</h4>
-                <span>Developer & Owner</span>
+                <h4>{{x.name}}</h4>
+                <span>{{x.work}}</span>
                 <div class="social">
-                  <a href="https://leetcode.com/s59_60r/"><i class="ri-code-fill"></i></a>
-                  <a href="https://codeforces.com/profile/s59_60r"><i class="ri-code-fill"></i></a>
-                  <a href="https://atcoder.jp/users/s59_60r"><i class="ri-code-fill"></i></a>
-                  <a href="https://github.com/s-i-d-d-i-s"> <i class="ri-github-fill"></i> </a> 
+                  <a href="{{x.leetcode}}"><i class="ri-code-fill"></i></a>
+                  <a href="{{x.codeforces}}"><i class="ri-code-fill"></i></a>
+                  <a href="{{x.atcoder}}"><i class="ri-code-fill"></i></a>
+                  <a href="{{x.github}}"> <i class="ri-github-fill"></i> </a> 
                 </div>
               </div>
             </div>
           </div>
+		  {% endfor %}
 
 
         </div>

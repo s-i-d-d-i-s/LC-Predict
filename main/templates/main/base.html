@@ -53,8 +53,8 @@
       <nav class="nav-menu d-none d-lg-block">
         <ul>
           <li><a href="{% url 'home' %}">Home</a></li>
-		  {% if user.username == 's59_60r' %} 
-		  <li><a href="{% url 'contests' %}">Contests</a></li>
+		  {% if user.profile.isStaff %} 
+		  <li><a href="{% url 'contests' %}">Admin</a></li>
           <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
 		  {% endif %}
           {% if user.is_authenticated %}

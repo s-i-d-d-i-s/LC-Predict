@@ -68,16 +68,7 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script type="text/javascript">
-    var APIKEY = localStorage.getItem("LCPredict_APIKEY");
-    if(APIKEY==null){
-        let foo = prompt('API Key was not found... Type here');
-        let bar = confirm('Confirm or deny');
-        if(true){
-            localStorage.setItem("LCPredict_APIKEY", foo);
-        }else{
-            window.location.href = "/";
-        }
-    }
+    var APIKEY = "{{user.profile.apikey}}";
     
     var predictionRunning = false;
     async function predict(pk){

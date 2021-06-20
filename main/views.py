@@ -2,7 +2,7 @@ from threading import active_count
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, request, response
 import time
-from .models import Contest, SiteData, UserData, Profile
+from .models import Contest, SiteData, UserData, Profile, Team
 from .LCPredictor import getPageNo,getRanklist,fetchAllUserData,getRatingChange,getRatingChangeCached,getForesight
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -48,7 +48,8 @@ def homepage(request):
 	predicitions_made,upd,any_other_headers,foresight_made = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
-	return render(request, 'main/home.html',{'foresight_made':foresight_made,'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
+	TeamObj = Team.objects.all().order_by('-pk')
+	return render(request, 'main/home.html',{'members':TeamObj,'foresight_made':foresight_made,'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
 
 @login_required
 def allcontests(request):
@@ -197,6 +198,7 @@ def add_prediction(username,contest):
 def dashboard(request):
 	obj = UserData.objects.all().first()
 	page_views = obj.page_views
+	foresight_made = obj.foresight_made
 	predicitions_made = obj.predicitions_made
 	recent_prediction = json.loads(obj.recent_prediction)
 	for i in range(len(recent_prediction)):
@@ -206,7 +208,12 @@ def dashboard(request):
 	active_users = [[x , active_users[x]] for x in active_users.keys()]
 	active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
 	active_users=active_users[:20]
-	return render(request,'main/dashboard.html',{'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
+	demographics =json.loads(obj.demographics)
+	demographics = [[x , demographics[x]] for x in demographics.keys()]
+	demographics = sorted(demographics, key=lambda x:x[1],reverse=True)
+	demographics=demographics[:20]
+	foresights = Profile.objects.all().order_by('foresights_made')
+	return render(request,'main/dashboard.html',{'foresights':foresights,'foresight_made':foresight_made,'demographics':demographics,'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
 
 @login_required
 def foresight_api(request):
@@ -244,6 +251,8 @@ def foresight_api(request):
 		
 @login_required
 def foresight(request):
+	request.user.profile.foresights_made+=1
+	request.user.profile.save()
 	return render(request,'main/foresight.html',{'msg':"Know Minimum Rank to get +ve Rating change based on Historic Data",'title':"Foresight"})
 
 

@@ -27,7 +27,7 @@
             <div class="card-body">
               <strong>Name : </strong>{{x.title}}
               <br>
-              {% if x.isProcess %}
+              {% if x.isProcess and not x.isPredicted %}
                 <strong>Status : </strong> <strong class="text-warning"> Running </strong>
               {% else %}
                 {% if x.isPredicted %}
