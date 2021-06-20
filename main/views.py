@@ -48,7 +48,7 @@ def homepage(request):
 	predicitions_made,upd,any_other_headers,foresight_made = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
-	TeamObj = Team.objects.all().order_by('-pk')
+	TeamObj = Team.objects.all().order_by('pk')
 	return render(request, 'main/home.html',{'members':TeamObj,'foresight_made':foresight_made,'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
 
 @login_required
