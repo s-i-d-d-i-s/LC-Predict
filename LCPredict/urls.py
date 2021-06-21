@@ -21,9 +21,10 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_view.homepage, name='home'),
-    path('contests', main_view.allcontests, name='contests'),
+    path('admin_panel', main_view.allcontests, name='contests'),
     path('predictions', main_view.predictions, name='predictions'),
     path('api/predict/<apikey>/<pk>', main_view.predict_contest_api, name='predict_contest_api'),
+	path('api/statusupdate/<apikey>/<operation>', main_view.status_updates_api, name='status_updates_api'),
     path('api/status/<apikey>/<pk>', main_view.get_contest_status, name='predict_contest_api'),
     path('predict/<pk>/<username>', main_view.predict_user, name='predict_user'),
     path('cache/<pk>', main_view.cache_contest, name='cache_contest'),

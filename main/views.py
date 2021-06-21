@@ -49,12 +49,17 @@ def homepage(request):
 	if any_other_headers=='null':
 		any_other_headers=''
 	TeamObj = Team.objects.all().order_by('pk')
+	upd = upd[::-1]
 	return render(request, 'main/home.html',{'members':TeamObj,'foresight_made':foresight_made,'predicitions_made':predicitions_made,'updates':upd,'any_other_headers':any_other_headers})
 
 @login_required
 def allcontests(request):
 	obj = Contest.objects.all()
-	return render(request, 'main/contests.html',{'data':obj})
+	obj2 = SiteData.objects.all().first()
+	status_data = json.loads(obj2.updates)
+	status_data = list(enumerate(status_data))
+	status_data = status_data[::-1]
+	return render(request, 'main/contests.html',{'status_data':status_data,'data':obj})
 
 
 def predictions(request):
@@ -83,6 +88,27 @@ def predict_contest_api(request,apikey,pk):
 				obj.isProcess=int(time.time())
 				obj.save()
 				predict_contest(pk)
+	return HttpResponse(json.dumps(response))
+
+def status_updates_api(request,apikey,operation):
+	obj = SiteData.objects.all().first()
+	keys = json.loads(obj.api_keys)
+	response = {'status':404,'msg':'Not Allowed'}
+	if apikey in keys and request.method == 'POST':
+		post_data = json.loads(request.body)
+		response = {'status':200,'msg':'API Matched'}
+		try:
+			data = json.loads(obj.updates)
+			if operation == 'CREATE':
+				data.append(post_data['data'])
+			else:
+				del data[int(post_data['index'])]
+		except Exception as e:
+			print(e)
+			response = {'status':505,'msg':'Internal Error'}
+			return HttpResponse(json.dumps(response))
+		obj.updates = json.dumps(data)
+		obj.save()
 	return HttpResponse(json.dumps(response))
 
 def get_contest_status(request,apikey,pk):
@@ -213,6 +239,7 @@ def dashboard(request):
 	demographics = sorted(demographics, key=lambda x:x[1],reverse=True)
 	demographics=demographics[:20]
 	foresights = Profile.objects.all().order_by('foresights_made')
+	
 	return render(request,'main/dashboard.html',{'foresights':foresights,'foresight_made':foresight_made,'demographics':demographics,'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
 
 @login_required

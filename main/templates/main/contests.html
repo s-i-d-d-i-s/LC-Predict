@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-<title>Contest Status</title>
+<title>Admin</title>
 {% endblock title %}
   
 
@@ -11,65 +11,93 @@
   <section id="hero" class="d-flex align-items-center">
 
     <div class="container">
-      <h1>Status of Contests</h1>
+      <h1>Admin Panel</h1>
+	  <h3>Manage LC-Predict	</h3>
     </div>
 
   </section><!-- End Hero -->
   <main id="main">
 
+	<section id="about" class="about">
+		<div class="row p-4">
+			<div class="container col-md-6" data-aos="fade-up">	
+				<h1>Status Updates</h1>
+				<hr>
+				<div class="card">
+					<div class="card-body">
+						<textarea class="form-control" id="new_status"></textarea>
+						<br>
+						<hr>
+						<button class="btn btn-success" onclick="createStatus()">Create</button>
+					</div>
+				</div>
+				
+				{% for x in status_data %}
+				<div class="card">
+					<div class="card-body">
+						{{x.1|safe}}
+						<br>
+						<hr>
+						<button class="btn btn-danger" onclick="deleteStatus({{x.0}})">Delete</button>
+					</div>
+					
+				</div>	
+				{% endfor %}
+			</div>
+		
+		<div class="container col-md-6" data-aos="fade-up">
+			{% for x in data%}
+			{% if x.isPredicted == False %}
+			<div class="card">
+			  <div class="card-body">
+				<strong>Name : </strong>{{x.title}}
+				<br>
+				{% if x.isProcess %}
+				<strong>Status : </strong> <strong class="text-warning" id="contest_status{{x.pk}}"> Running </strong>
+			  {% else %}
+				{% if x.isPredicted %}
+					<strong>Status : </strong> <strong class="text-success" id="contest_status{{x.pk}}"> Finished </strong>
+				{% else %}
+					<strong>Status : </strong> <strong class="text-danger" id="contest_status{{x.pk}}"> Waiting </strong>
+				{% endif %}
+			  {% endif %}
+			  <br>
+				{% if x.isMeta %}
+				  <strong>Metadata Fetched : </strong> <strong class="text-success" id="contest_meta{{x.pk}}"> YES </strong> ( {{x.page_limit}} Pages) 
+				{% else %}
+				  <strong>Metadata Fetched : </strong> <strong class="text-danger" id="contest_meta{{x.pk}}"> NO </strong>
+				{% endif %}
+				<br>
+				{% if x.isRanklist %}
+				  <strong>Ranklist Fetched : </strong> <strong class="text-success" id="contest_ranklist{{x.pk}}"> YES </strong>
+				{% else %}
+				  <strong>Ranklist Fetched : </strong> <strong class="text-danger" id="contest_ranklist{{x.pk}}"> NO </strong>
+				{% endif %}
+				<br>
+				{% if x.isUserdata %}
+				  <strong>Userdata Fetched : </strong> <strong class="text-success" id="contest_userdata{{x.pk}}"> YES </strong>
+				{% else %}
+				  <strong>Userdata Fetched : </strong> <strong class="text-danger" id="contest_userdata{{x.pk}}"> ({{x.userdata_progress}})  </strong>
+				{% endif %}
+				
+				<br>
+				<button class="btn btn-info" onclick="runPrediction({{x.pk}})">Get Prediction</button>
+			  </div>
+			</div>
+			{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+	</section>
 
-    <!-- ======= About Us Section ======= -->
-    <section id="about" class="about">
-      <div class="container" data-aos="fade-up">
-          {% for x in data%}
-          {% if x.isPredicted == False %}
-          <div class="card">
-            <div class="card-body">
-              <strong>Name : </strong>{{x.title}}
-              <br>
-              {% if x.isProcess %}
-              <strong>Status : </strong> <strong class="text-warning" id="contest_status{{x.pk}}"> Running </strong>
-            {% else %}
-              {% if x.isPredicted %}
-                  <strong>Status : </strong> <strong class="text-success" id="contest_status{{x.pk}}"> Finished </strong>
-              {% else %}
-                  <strong>Status : </strong> <strong class="text-danger" id="contest_status{{x.pk}}"> Waiting </strong>
-              {% endif %}
-            {% endif %}
-            <br>
-              {% if x.isMeta %}
-                <strong>Metadata Fetched : </strong> <strong class="text-success" id="contest_meta{{x.pk}}"> YES </strong> ( {{x.page_limit}} Pages) 
-              {% else %}
-                <strong>Metadata Fetched : </strong> <strong class="text-danger" id="contest_meta{{x.pk}}"> NO </strong>
-              {% endif %}
-              <br>
-              {% if x.isRanklist %}
-                <strong>Ranklist Fetched : </strong> <strong class="text-success" id="contest_ranklist{{x.pk}}"> YES </strong>
-              {% else %}
-                <strong>Ranklist Fetched : </strong> <strong class="text-danger" id="contest_ranklist{{x.pk}}"> NO </strong>
-              {% endif %}
-              <br>
-              {% if x.isUserdata %}
-                <strong>Userdata Fetched : </strong> <strong class="text-success" id="contest_userdata{{x.pk}}"> YES </strong>
-              {% else %}
-                <strong>Userdata Fetched : </strong> <strong class="text-danger" id="contest_userdata{{x.pk}}"> ({{x.userdata_progress}})  </strong>
-              {% endif %}
-              
-              <br>
-              <button class="btn btn-info" onclick="runPrediction({{x.pk}})">Get Prediction</button>
-            </div>
-          </div>
-          {% endif %}
-          {% endfor %}
-      </div>
-    </section><!-- End Frequently Asked Questions Section -->
 
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script type="text/javascript">
     var APIKEY = "{{user.profile.apikey}}";
-    
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFToken';
     var predictionRunning = false;
     async function predict(pk){
         while(true){
@@ -146,5 +174,25 @@
           console.log('Prediction already running');
         }
     }
+
+	function createStatus(){
+		var doc = getObj('new_status').value;
+		console.log(doc);
+		payload = 'api/statusupdate/'+APIKEY+'/CREATE';
+
+        axios.post(payload,{
+			data : doc
+		}).then(response=> {
+			window.location.reload();
+		}).catch(error => console.error(error));
+	}
+	function deleteStatus(idx){
+		payload = 'api/statusupdate/'+APIKEY+'/DELETE';
+        axios.post(payload,{
+			index : idx
+		}).then(response=> {
+			window.location.reload();
+		}).catch(error => console.error(error));
+	}
 </script>
 {% endblock content %}

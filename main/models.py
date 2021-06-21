@@ -17,6 +17,7 @@ class Contest(models.Model):
 	userdata_begin = models.IntegerField(default=0)
 	userdata_progress = models.TextField(default="null")
 	reference = models.TextField(default="null")
+	manager = models.CharField(max_length=30,default='null')
 	def __str__(self):
 		return "{} : {}".format(self.title,self.isPredicted)
 
@@ -55,6 +56,7 @@ class Profile(models.Model):
 		return f'{self.user.username} Profile'
 
 class Team(models.Model):
+	username = models.CharField(max_length=30,default='null')
 	name = models.CharField(max_length=30,default='null')
 	img = models.CharField(max_length=255,default='#')
 	work = models.CharField(max_length=30,default='null')
