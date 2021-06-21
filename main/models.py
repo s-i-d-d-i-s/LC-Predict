@@ -59,10 +59,10 @@ class Team(models.Model):
 	username = models.CharField(max_length=30,default='null')
 	name = models.CharField(max_length=30,default='null')
 	img = models.CharField(max_length=255,default='#')
-	work = models.CharField(max_length=30,default='null')
-	github = models.CharField(max_length=30,default='null')
-	codeforces = models.CharField(max_length=30,default='null')
-	leetcode = models.CharField(max_length=30,default='null')
-	atcoder = models.CharField(max_length=30,default='null')
+	work = models.CharField(max_length=255,default='null')
+	github = models.CharField(max_length=255,default='null')
+	codeforces = models.CharField(max_length=255,default='null')
+	leetcode = models.CharField(max_length=255,default='null')
+	atcoder = models.CharField(max_length=255,default='null')
 	def __str__(self):
 		return self.name

@@ -238,7 +238,7 @@ def dashboard(request):
 	demographics = [[x , demographics[x]] for x in demographics.keys()]
 	demographics = sorted(demographics, key=lambda x:x[1],reverse=True)
 	demographics=demographics[:20]
-	foresights = Profile.objects.all().order_by('foresights_made')
+	foresights = Profile.objects.all().order_by('-foresights_made')
 	
 	return render(request,'main/dashboard.html',{'foresights':foresights,'foresight_made':foresight_made,'demographics':demographics,'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
 
