@@ -239,6 +239,8 @@ def foresight_api(request):
 		for x in data:
 			if cnt==0:
 				break
+			if x.isPredicted==False:
+				continue
 			temp = int(getForesight(x.ranklist,x.userdata,int(rating),int(contest_played)))
 			res.append(f'Rank around <strong class="text-success">{temp}</strong> in {x.title}')
 			cnt-=1
