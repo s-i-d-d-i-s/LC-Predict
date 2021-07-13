@@ -38,11 +38,16 @@ def getPage(page,data2,visit,PAGE_LIMIT,CONTEST):
 		('pagination', str(page)),
 		('region', 'global'),
 	)
-	try:
-		data = json.loads(requests.get('https://leetcode.com/contest/api/ranking/{}/'.format(CONTEST), headers=headers, params=params).content)
-	except:
-		print("error at page",page)
-		return 
+	success = 3
+	while success > 0:
+		try:
+			data = json.loads(requests.get('https://leetcode.com/contest/api/ranking/{}/'.format(CONTEST), headers=headers, params=params).content)
+			success = -1
+		except:
+			time.sleep(10)
+			success -= 1
+	if success != -1:
+		return
 	res = []
 	for x in data['total_rank']:
 		if int(x['score']) ==0:
@@ -55,21 +60,28 @@ def getPage(page,data2,visit,PAGE_LIMIT,CONTEST):
 	visit.add(page)
 	return
 
-def getRanklist(contest,PAGE_LIMIT):
-	res = []
+def getRanklist(contest,PAGE_LIMIT,obj):
+	
 	visit=set()
-	for i in range(1,1000,50):
+	for i in range(obj.ranklist_begin+1,1000,50):
+		res = []
 		THREADS = []
 		for j in range(i,i+50):
 			THREADS.append(threading.Thread(target=getPage, args=(j,res,visit,PAGE_LIMIT,contest,)))
 		for j in range(len(THREADS)):
 			THREADS[j].start()
 		for j in range(len(THREADS)):
-			THREADS[j].join()
-		print(f'{i}')
-	res = sorted(res, key=lambda x: x[0])
-	res = json.dumps(res)
-	return res
+			THREADS[j].join()		
+		obj.ranklist_begin+=50
+		old_res = []
+		if obj.ranklist != 'null' :
+			old_res = json.loads(obj.ranklist)
+		old_res.extend(res)
+		old_res = sorted(old_res, key=lambda x: x[0])
+		obj.ranklist = json.dumps(old_res)
+		obj.save()
+		print(f'{obj.ranklist_begin}')
+	return
 
 def getUserData_US(username,get_current,CONTEST_NAME):
 	data = '{"operationName":"getContestRankingData","variables":{"username":\"'+username+'\"},"query":"query getContestRankingData($username: String!) {\\n  userContestRanking(username: $username) {\\n    attendedContestsCount\\n    rating\\n    globalRanking\\n    __typename\\n  }\\n  userContestRankingHistory(username: $username) {\\n    contest {\\n      title\\n      startTime\\n      __typename\\n    }\\n    rating\\n    ranking\\n    __typename\\n  }\\n}\\n"}'

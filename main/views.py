@@ -54,12 +54,14 @@ def homepage(request):
 
 @login_required
 def allcontests(request):
-	obj = Contest.objects.all()
-	obj2 = SiteData.objects.all().first()
-	status_data = json.loads(obj2.updates)
-	status_data = list(enumerate(status_data))
-	status_data = status_data[::-1]
-	return render(request, 'main/contests.html',{'status_data':status_data,'data':obj})
+	if request.user.profile.isStaff == True:
+		obj = Contest.objects.all()
+		obj2 = SiteData.objects.all().first()
+		status_data = json.loads(obj2.updates)
+		status_data = list(enumerate(status_data))
+		status_data = status_data[::-1]
+		return render(request, 'main/contests.html',{'status_data':status_data,'data':obj})
+	return HttpResponse('Not Allowed')
 
 
 def predictions(request):
@@ -142,18 +144,17 @@ def predict_contest(pk):
 			obj.isMeta=True
 			obj.save()
 		if obj.isRanklist==False:
-			ranklist = getRanklist(obj.slug,obj.page_limit)
-			obj.ranklist=ranklist
+			ranklist = getRanklist(obj.slug,obj.page_limit,obj)
 			obj.isRanklist=True
 			obj.save()
-		if obj.isUserdata==False:
-			userdata = fetchAllUserData(obj.ranklist,obj.title,obj)
-			obj.userdata=userdata
-			obj.isUserdata=True
-			obj.save()
-		if obj.isUserdata and obj.isRanklist and obj.isMeta:
-			obj.isPredicted=True
-			obj.save()
+		# if obj.isUserdata==False:
+		# 	userdata = fetchAllUserData(obj.ranklist,obj.title,obj)
+		# 	obj.userdata=userdata
+		# 	obj.isUserdata=True
+		# 	obj.save()
+		# if obj.isUserdata and obj.isRanklist and obj.isMeta:
+		# 	obj.isPredicted=True
+		# 	obj.save()
 		return 
 
 
@@ -220,27 +221,30 @@ def add_prediction(username,contest):
 		data[today]=1
 	obj.predictions_heatmap=json.dumps(data)
 	obj.save()
-	
+
+@login_required
 def dashboard(request):
-	obj = UserData.objects.all().first()
-	page_views = obj.page_views
-	foresight_made = obj.foresight_made
-	predicitions_made = obj.predicitions_made
-	recent_prediction = json.loads(obj.recent_prediction)
-	for i in range(len(recent_prediction)):
-		recent_prediction[i][0] = int(time.time())-recent_prediction[i][0]
-	recent_prediction = recent_prediction[::-1]
-	active_users =json.loads(obj.active_users)
-	active_users = [[x , active_users[x]] for x in active_users.keys()]
-	active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
-	active_users=active_users[:20]
-	demographics =json.loads(obj.demographics)
-	demographics = [[x , demographics[x]] for x in demographics.keys()]
-	demographics = sorted(demographics, key=lambda x:x[1],reverse=True)
-	demographics=demographics[:20]
-	foresights = Profile.objects.all().order_by('-foresights_made')
-	
-	return render(request,'main/dashboard.html',{'foresights':foresights,'foresight_made':foresight_made,'demographics':demographics,'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
+	if request.user.profile.isStaff == True:
+		obj = UserData.objects.all().first()
+		page_views = obj.page_views
+		foresight_made = obj.foresight_made
+		predicitions_made = obj.predicitions_made
+		recent_prediction = json.loads(obj.recent_prediction)
+		for i in range(len(recent_prediction)):
+			recent_prediction[i][0] = int(time.time())-recent_prediction[i][0]
+		recent_prediction = recent_prediction[::-1]
+		active_users =json.loads(obj.active_users)
+		active_users = [[x , active_users[x]] for x in active_users.keys()]
+		active_users = sorted(active_users, key=lambda x:x[1],reverse=True)
+		active_users=active_users[:20]
+		demographics =json.loads(obj.demographics)
+		demographics = [[x , demographics[x]] for x in demographics.keys()]
+		demographics = sorted(demographics, key=lambda x:x[1],reverse=True)
+		demographics=demographics[:20]
+		foresights = Profile.objects.all().order_by('-foresights_made')
+		
+		return render(request,'main/dashboard.html',{'foresights':foresights,'foresight_made':foresight_made,'demographics':demographics,'active_users':active_users,'recent_prediction':recent_prediction,'page_views':page_views,'predicitions_made':predicitions_made,'title':'Dashboard'})
+	return HttpResponse("Not Allowed")
 
 @login_required
 def foresight_api(request):

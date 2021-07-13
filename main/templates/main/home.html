@@ -13,15 +13,15 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
-          <h1>Leetcode Rating?</h1>
-          <h2>no more waiting...</h2>
+          <h1>LC Predict</h1>
+          <h2>Predict Leetcode Rating</h2>
           <h2>{{predicitions_made}} predictions, {{foresight_made}} foresights and counting...</h2>
           <div class="d-lg-flex">
             <a href="{% url 'predictions' %}" class="btn-get-started scrollto">Contests</a>
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
-          <img src="https://assets.leetcode.com/static_assets/public/webpack_bundles/images/logo-dark.e99485d9b.svg" class="img-fluid animated" alt="">
+          <img src="{% static 'main/assets/img/logo.png' %}" class="img-fluid animated" alt="">
         </div>
       </div>
     </div>

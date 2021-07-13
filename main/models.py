@@ -14,6 +14,7 @@ class Contest(models.Model):
 	isUserdata = models.BooleanField(default=False)
 	ranklist = models.TextField(default="null")
 	userdata = models.TextField(default="null")
+	ranklist_begin = models.IntegerField(default=0)
 	userdata_begin = models.IntegerField(default=0)
 	userdata_progress = models.TextField(default="null")
 	reference = models.TextField(default="null")

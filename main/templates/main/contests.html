@@ -101,7 +101,7 @@
     var predictionRunning = false;
     async function predict(pk){
         while(true){
-            await new Promise(r => setTimeout(r, 10000));
+            await new Promise(r => setTimeout(r, 20000));
             getPrediction(pk);
             getStatus(pk);
         }
