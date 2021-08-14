@@ -1,3 +1,4 @@
+import ipaddress
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -42,6 +43,7 @@ class Profile(models.Model):
 	apikey = models.CharField(max_length=30,default='null')
 	isStaff = models.BooleanField(default=False)
 	isVerified = models.BooleanField(default=False)
+	ipaddress = models.CharField(max_length=255,unique=True)
 	last_tried_verify = models.IntegerField(default=0)
 	hashVal = models.CharField(max_length=25,default="")
 	last_user_foresight = models.IntegerField(default=0)

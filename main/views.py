@@ -254,6 +254,7 @@ def register(request):
 			user = form.save()
 			profile = profile_form.save(commit=False)
 			profile.user = user
+			profile.ipaddress = get_client_ip(request)
 			profile.save()
 			username = form.cleaned_data.get('username')
 			messages.success(request,f"Account Created for {username}")
