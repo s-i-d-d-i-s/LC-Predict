@@ -27,14 +27,15 @@ def get_client_ip(request):
 def view_plus(request=None):
 	obj = UserData.objects.all().first()
 	if request!=None:
-		country = getCountry(get_client_ip(request))
-		foo = json.loads(obj.demographics)
-		print(foo)
-		if country in foo.keys():
-			foo[country]+=1
-		else:
-			foo[country]=1
-		obj.demographics=json.dumps(foo)
+		pass
+		# country = getCountry(get_client_ip(request))
+		# foo = json.loads(obj.demographics)
+		# print(foo)
+		# if country in foo.keys():
+		# 	foo[country]+=1
+		# else:
+		# 	foo[country]=1
+		# obj.demographics=json.dumps(foo)
 
 	cur = obj.predicitions_made
 	obj2 = SiteData.objects.all().first()
@@ -284,6 +285,7 @@ def foresight_api(request):
 		
 @login_required
 def foresight(request):
+	return HttpResponse('Disabled Temporarily')
 	request.user.profile.foresights_made+=1
 	request.user.profile.save()
 	return render(request,'main/foresight.html',{'msg':"Know Minimum Rank to get +ve Rating change based on Historic Data",'title':"Foresight"})
