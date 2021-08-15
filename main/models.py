@@ -14,17 +14,13 @@ class Contest(models.Model):
 	isUserdata = models.BooleanField(default=False)
 	ranklist = models.TextField(default="null")
 	userdata = models.TextField(default="null")
-	ranklist_begin = models.IntegerField(default=0)
-	userdata_begin = models.IntegerField(default=0)
 	userdata_progress = models.TextField(default="null")
-	reference = models.TextField(default="null")
 	manager = models.CharField(max_length=30,default='null')
 	def __str__(self):
 		return "{} : {}".format(self.title,self.isPredicted)
 
 class SiteData(models.Model):
 	any_other_headers = models.TextField(default="null")
-	api_keys = models.TextField(default="[]")
 	updates =  models.TextField(default="[]")
 	def __str__(self):
 		return "PK : {}".format(self.pk)

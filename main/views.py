@@ -56,12 +56,11 @@ def homepage(request):
 @login_required
 def allcontests(request):
 	if request.user.profile.isStaff == True:
-		obj = Contest.objects.all()
 		obj2 = SiteData.objects.all().first()
 		status_data = json.loads(obj2.updates)
 		status_data = list(enumerate(status_data))
 		status_data = status_data[::-1]
-		return render(request, 'main/contests.html',{'status_data':status_data,'data':obj})
+		return render(request, 'main/contests.html',{'status_data':status_data})
 	return HttpResponse('Not Allowed')
 
 
@@ -73,25 +72,7 @@ def predictions(request):
 	return render(request, 'main/status.html',{'data':obj,'title':'Predictions','any_other_headers':any_other_headers})
 
 
-def predict_contest_api(request,apikey,pk):
-	obj = SiteData.objects.all().first()
-	keys = json.loads(obj.api_keys)
-	response = {'status':404,'msg':'API Key Mismatch'}
-	if apikey in keys:
-		response = {'status':200,'msg':'API Matched'}
-		obj = Contest.objects.filter(pk=pk)
-		if len(obj) ==0 :
-			response = {'status':404,'msg':'No Such Contest Exists'}
-		else:
-			obj = obj.first()
-			isRunning = int(time.time()) - obj.isProcess
-			if isRunning <= 50 :
-				response = {'status':404,'msg':'Prediction already running'}
-			else:
-				obj.isProcess=int(time.time())
-				obj.save()
-				predict_contest(pk)
-	return HttpResponse(json.dumps(response))
+
 
 def status_updates_api(request,apikey,operation):
 	obj = SiteData.objects.all().first()
@@ -114,25 +95,6 @@ def status_updates_api(request,apikey,operation):
 		obj.save()
 	return HttpResponse(json.dumps(response))
 
-def get_contest_status(request,apikey,pk):
-	obj = SiteData.objects.all().first()
-	keys = json.loads(obj.api_keys)
-	response = {'status':404,'msg':'API Key Mismatch'}
-	if apikey in keys:
-		response = {'status':200,'msg':'API Matched'}
-		obj = Contest.objects.filter(pk=pk)
-		if len(obj) ==0 :
-			response = {'status':404,'msg':'No Such Contest Exists'}
-		else:
-			obj = obj.first()
-			response['page_limit']=obj.page_limit
-			response['isMeta']=obj.isMeta
-			response['isPredicted']=obj.isPredicted
-			response['isProcess']=obj.isProcess
-			response['isRanklist']=obj.isRanklist
-			response['isUserdata']=obj.isUserdata
-			response['userdata_progress']=obj.userdata_progress
-	return HttpResponse(json.dumps(response))
 
 def predict_contest(pk):
 	obj = Contest.objects.filter(pk=pk).first()
@@ -159,17 +121,6 @@ def predict_contest(pk):
 		return 
 
 
-@login_required
-def cache_contest(request,pk):
-	obj = Contest.objects.filter(pk=pk).first()
-	if obj.isPredicted==True:
-		data = getRatingChangeCached(obj.ranklist,obj.userdata)
-		obj.reference=json.dumps(data)
-		obj.save()
-		return render(request, 'main/showrating.html',{'msg':"Here are your rating changes"})
-	else:
-		return render(request, 'main/showrating.html',{'msg':"Rating Change has not been calculated. Please try loading page again"})
-
 def predict_user(request,pk,username):
 	view_plus(request)
 	try:
@@ -184,9 +135,8 @@ def predict_user(request,pk,username):
 		return HttpResponse("User not found !")
 	add_prediction(username,obj.title)
 	response = change_data
-	
-		
 	return HttpResponse(json.dumps(response))
+
 
 def getCountry(ip):
 	try:
