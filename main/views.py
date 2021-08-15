@@ -46,6 +46,15 @@ def view_plus(request=None):
 	return cur,upd,obj2.any_other_headers,obj.foresight_made
 
 def homepage(request):
+	return HttpResponse("""
+	I have temporarily disabled this website.
+
+	Read about it here. I will be uploading the predicitions here
+
+
+	<a href="https://github.com/s-i-d-d-i-s/LC-Predict/discussions/">Link to Discuss</a>
+	
+	""")
 	predicitions_made,upd,any_other_headers,foresight_made = view_plus(request)
 	if any_other_headers=='null':
 		any_other_headers=''
